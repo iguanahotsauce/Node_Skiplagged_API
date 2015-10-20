@@ -1,0 +1,20 @@
+{
+  "name": "flights",
+  "version": "0.0.1",
+  "description": "Node.js wrapper for Skiplagged API",
+  "author": "Alex Beebe <alexbeebe@comcast.net>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:iguanahotsauce/Node_Skiplagged_API.git"
+  },
+  "dependencies": {
+    "cheerio": "^0.18.0",
+    "request": "^2.53.0"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "main": "skiplagged_api_wrapper.js",
+  "license": "MIT"
+}
