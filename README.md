@@ -11,26 +11,13 @@ var CurrentFlight = new Flights('FROM', 'TO', 'SORT', RESULTS, 'DEPARTURE_DATE')
 ```
 # Variables
 ## Required
-**'FROM' (string)**          
-> Departure Airport IATA Code
-
-**'TO' (string)**
-> Arrival Airport IATA Code
-
-**'SORT' (string)**
-> 'cost' Sorts by Cost Low to High
-
-> 'duration' Sorts by Flight Duration Low to High
-
-> 'path' Sorts by Number of Legs in Flight Low to High
-
-**RESULTS (int)**
-> 1 to Return First Result
-
-> 0 to Return All Results
-
-**'DEPARTURE_DATE' (string)**
-> Departure Date in YYYY-MM-DD format
+| Variable Name  | Datatype | Description
+|----------------|----------|-----------------------------------------------------------------------------
+| FROM           | string   | Departure Airport IATA Code
+| TO             | string   | Arrival Airport IATA Code
+| SORT           | string   | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
+| REULTS         | int      | 1 to Return First Result<br>0 to Return All Results
+| DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
 
 # Example
 ```javascript
