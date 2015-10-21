@@ -10,11 +10,27 @@ var Flights = require('flights');
 var CurrentFlight = new Flights('FROM', 'TO', 'SORT', RESULTS, 'DEPARTURE_DATE');
 ```
 # Variables
-* 'FROM'          string: (required) Departure Airport IATA Code
-* 'TO'              string: (required) Arrival Airport IATA Code
-* 'SORT'            string: (required) 'cost' Sorts by Cost Low to High, 'duration' Sorts by Flight Duration Low to High, 'path' Sorts by Number of Legs in Flight Low to High
-* RESULTS             int: (required) 1 to Return First Result, 0 to Return All Results
-* 'DEPARTURE_DATE' string: (required) Departure Date in YYYY-MM-DD format
+## Required
+**'FROM' (string)**          
+> Departure Airport IATA Code
+
+**'TO' (string)**
+> Arrival Airport IATA Code
+
+**'SORT' (string)**
+> 'cost' Sorts by Cost Low to High
+
+> 'duration' Sorts by Flight Duration Low to High
+
+> 'path' Sorts by Number of Legs in Flight Low to High
+
+**RESULTS (int)**
+> 1 to Return First Result
+
+> 0 to Return All Results
+
+**'DEPARTURE_DATE' (string)**
+> Departure Date in YYYY-MM-DD format
 
 # Example
 ```javascript
