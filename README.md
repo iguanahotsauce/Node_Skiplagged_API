@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API.svg?branch=master)](https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API)
+
 # Node_Skiplagged_API
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 # Installation
