@@ -7,6 +7,7 @@ function Flight(data) {
   data.RESULTS = data.RESULTS || 1;
   data.SORT = data.SORT || 'cost';
   data.RETURN_DATE = data.RETURN_DATE || '';
+  data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
 
   var flightUrl = BASE_URL;
 
@@ -22,7 +23,9 @@ function Flight(data) {
                 data.SORT;
 
   this.flightUrl = flightUrl;
-  this.returnCount = data.RESULTS;
+  this.return_count = data.RESULTS;
+  this.destination = data.TO;
+  this.skip_hidden_city = data.SKIP_HIDDEN_CITY;
 }
 
 function parseDurationInt(duration) {
@@ -70,10 +73,11 @@ function findTimestampDifference(start_timestamp, end_timestamp) {
   return parseDurationInt(difference);
 }
 
-function getFlightData(callback, flightUrl, returnCount) {
+function getFlightData(callback, flightUrl, return_count, destination, skip_hidden_city) {
   var request = require('request');
   var airports = require('airport-codes');
   var moment = require('moment-timezone');
+
 
   var flights = [];
 
@@ -82,6 +86,8 @@ function getFlightData(callback, flightUrl, returnCount) {
       var flight_data = JSON.parse(body);
 
       for(var j=0; j<flight_data.depart.length; j++) {
+        var is_hidden_city = false;
+
         var key = flight_data.depart[j][3];
 
         var current_flight = {
@@ -93,6 +99,11 @@ function getFlightData(callback, flightUrl, returnCount) {
         };
 
         for(var i=0; i<flight_data.flights[key][0].length; i++) {
+          if(i === (flight_data.flights[key][0].length - 1) && flight_data.flights[key][0][i][3] != destination && skip_hidden_city === true) {
+            is_hidden_city = true;
+            break;
+          }
+
           var airline = flight_data.airlines[flight_data.flights[key][0][i][0].substring(0, 2)];
           var flight_number = flight_data.flights[key][0][i][0];
           var departing_from = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('name') + ', ' + flight_data.flights[key][0][i][1] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('country');
@@ -112,9 +123,11 @@ function getFlightData(callback, flightUrl, returnCount) {
           current_flight.legs.push(current_leg);
         }
 
-        flights.push(current_flight);
+        if(is_hidden_city === false) {
+          flights.push(current_flight);
+        }
 
-        if(returnCount == 1) {
+        if(return_count === 1 && flights.length === 1) {
           break;
         }
       }
@@ -140,5 +153,5 @@ Flight.prototype.getFlightUrl = function() {
 };
 
 Flight.prototype.getFlightData = function(callback) {
-  return getFlightData(callback, this.flightUrl, this.returnCount);
+  return getFlightData(callback, this.flightUrl, this.return_count, this.destination, this.skip_hidden_city);
 };
