@@ -10,7 +10,6 @@
   "dependencies": {
     "airport-codes": "1.0.2",
     "moment-timezone": "0.4.1",
-    "mysql": "2.9.0",
     "request": "2.65.0"
   },
   "main": "skiplagged_api_wrapper.js",

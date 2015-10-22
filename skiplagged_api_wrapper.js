@@ -2,27 +2,27 @@ var BASE_URL = 'https://skiplagged.com/api/search.php';
 
 module.exports = Flight;
 
-function Flight(from, to, sort, return_count, depart_date, return_date) {
+function Flight(data) {
+  data.CONFIG = data.CONFIG || {};
+  data.RESULTS = data.RESULTS || 1;
+  data.SORT = data.SORT || 'cost';
+  data.RETURN_DATE = data.RETURN_DATE || '';
+
   var flightUrl = BASE_URL;
 
-  flightUrl += '?from='     +
-                from        +
-                '&to='      +
-                to          +
-                '&depart='  +
-                depart_date +
-                '&sort='     +
-                sort;
-
-  if(typeof return_dat != 'undefined' && return_date.length > 0) {
-    flightUrl += '&return=' + return_date;
-  }
-  else {
-    flightUrl += '&return=';
-  }
+  flightUrl += '?from='          +
+                data.FROM        +
+                '&to='           +
+                data.TO          +
+                '&depart='       +
+                data.DEPART_DATE +
+                '&return'        +
+                data.RETURN_DATE +
+                '&sort='         +
+                data.SORT;
 
   this.flightUrl = flightUrl;
-  this.returnCount = return_count;
+  this.returnCount = data.RESULTS;
 }
 
 function parseDurationInt(duration) {
@@ -95,8 +95,8 @@ function getFlightData(callback, flightUrl, returnCount) {
         for(var i=0; i<flight_data.flights[key][0].length; i++) {
           var airline = flight_data.airlines[flight_data.flights[key][0][i][0].substring(0, 2)];
           var flight_number = flight_data.flights[key][0][i][0];
-          var departing_from = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('name') + ', ' + flight_data.flights[key][0][i][1];
-          var arriving_at = airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('name') + ', ' + flight_data.flights[key][0][i][3];
+          var departing_from = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('name') + ', ' + flight_data.flights[key][0][i][1] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('country');
+          var arriving_at = airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('name') + ', ' + flight_data.flights[key][0][i][3] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('country');
           var duration = findTimestampDifference(flight_data.flights[key][0][i][2], flight_data.flights[key][0][i][4]);
           var departure_time = moment(flight_data.flights[key][0][i][2]).format('dddd, MMMM Do YYYY, hh:mma');
           var arrival_time = moment(flight_data.flights[key][0][i][4]).format('dddd, MMMM Do YYYY, hh:mma');
