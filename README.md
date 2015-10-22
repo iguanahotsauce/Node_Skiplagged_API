@@ -18,7 +18,7 @@ var CurrentFlight = new Flights(data);
 | DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
 ##Optional
 | Variable Name  | Datatype  | Default | Description
-|----------------|---------- |-----------------------------------------------------------------------------
+|----------------|---------- |---------|--------------------------------------------------------------------
 | SORT           | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
 | RESULTS         | int      | 1       | 1 to Return First Result<br>0 to Return All Results
 # Example
