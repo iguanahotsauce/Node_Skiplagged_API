@@ -1,4 +1,3 @@
-[![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-url]][daviddm-image]
 # Node_Skiplagged_API
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 # Installation
@@ -8,7 +7,7 @@ npm install . -g
 # Usage
 ```javascript
 var Flights = require('flights');
-var CurrentFlight = new Flights('FROM', 'TO', 'SORT', RESULTS, 'DEPARTURE_DATE');
+var CurrentFlight = new Flights(data);
 ```
 # Variables
 ## Required
@@ -16,13 +15,22 @@ var CurrentFlight = new Flights('FROM', 'TO', 'SORT', RESULTS, 'DEPARTURE_DATE')
 |----------------|----------|-----------------------------------------------------------------------------
 | FROM           | string   | Departure Airport IATA Code
 | TO             | string   | Arrival Airport IATA Code
-| SORT           | string   | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
-| RESULTS         | int      | 1 to Return First Result<br>0 to Return All Results
 | DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
-
+##Optional
+| Variable Name  | Datatype  | Default | Description
+|----------------|---------- |-----------------------------------------------------------------------------
+| SORT           | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
+| RESULTS         | int      | 1       | 1 to Return First Result<br>0 to Return All Results
 # Example
 ```javascript
 var Flights = require('flights');
+
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2015-10-25'
+};
+
 var CurrentFlight = new Flights('PDX', 'JFK', 'cost', 1, '2015-10-25');
 
 CurrentFlight.getFlightData(function(error, body) {
@@ -72,8 +80,3 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 # License
 [The MIT License](LICENSE)
-
-[travis-url]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API
-[travis-image]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API.svg?branch=master
-[daviddm-url]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API.svg?theme=shields.io
-[daviddm-image]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API
