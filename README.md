@@ -31,7 +31,7 @@ var data = {
   DEPARTURE_DATE: '2015-10-25'
 };
 
-var CurrentFlight = new Flights('PDX', 'JFK', 'cost', 1, '2015-10-25');
+var CurrentFlight = new Flights(data);
 
 CurrentFlight.getFlightData(function(error, body) {
   body = JSON.stringify(body, undefined, 4);
