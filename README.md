@@ -1,3 +1,5 @@
+[![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-url]][daviddm-image]
+
 # Node_Skiplagged_API
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 # Installation
@@ -137,3 +139,8 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 # License
 [The MIT License](LICENSE)
+
+[travis-url]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API
+[travis-image]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API.svg?branch=master
+[daviddm-url]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API.svg?theme=shields.io
+[daviddm-image]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API
