@@ -4,7 +4,7 @@
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 # Installation
 ```sh
-npm install . -g
+npm install examples/.
 ```
 # Usage
 ```javascript
