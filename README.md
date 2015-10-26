@@ -9,6 +9,19 @@ npm install . -g
 var Flights = require('flights');
 var CurrentFlight = new Flights(data);
 ```
+# Config
+Example of the config.js file
+
+```javascript
+var config = module.exports = {};
+
+config.MYSQL = {
+	DATABASE: 'flight_data',
+	USERNAME: username,
+	PASSWORD: password,
+	HOST: host
+};
+```
 # Variables
 ## Required
 | Variable Name  | Datatype | Description
