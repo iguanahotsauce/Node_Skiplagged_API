@@ -13,6 +13,6 @@
     "moment-timezone": "0.4.1",
     "mysql": "2.9.0"
   },
-  "main": "index.js",
+  "main": "../index.js",
   "license": "MIT"
 }
