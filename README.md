@@ -149,6 +149,12 @@ CurrentFlight.getFlightData(function(error, body) {
 ]
 ```
 ## Database Tracking
+With the Database Tracking functionality you can set SAVE_TO_DATABSE equal to true in your data object and the flight data will be saved to a mysql database. Every five minutes there will be a new request made to the [Skiplagged](http://skiplagged.com) API to retrieve new flight data.
+
+Every time new flight data is retrieved the flight price will be compared against the saved flight prices in the database and if the new flight price is below the price trend an email will be sent to the email address that is set in the config file saying that the prices have dropped and now is a good time to book the flight.
+
+Data will be collected for the number of days set in the config file, DAYS_BEFORE_COMPARISON, before sending the price emails so that a good base line is set.
+
 ```javascript
 var Flights = require('../index');
 var config = require('./config');
