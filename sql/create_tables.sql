@@ -10,6 +10,9 @@ create table flight_data.flights (
   flight_key_long VARCHAR(192) NOT NULL,
   duration MEDIUMINT NOT NULL,
   price MEDIUMINT NOT NULL,
+  from_iata VARCHAR(5) NOT NULL,
+  to_iata VARCHAR(5) NOT NULL,
+  departure_date DATETIME NOT NULL,
   PRIMARY KEY(flight_id)
 );
 

@@ -10,8 +10,10 @@
   "dependencies": {
     "airport-codes": "1.0.2",
     "async-waterfall": "0.1.5",
+    "forever": "0.15.1",
     "moment-timezone": "0.4.1",
-    "mysql": "2.9.0"
+    "mysql": "2.9.0",
+    "nodemailer": "1.8.0"
   },
   "main": "index.js",
   "license": "MIT"

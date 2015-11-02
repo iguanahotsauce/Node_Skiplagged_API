@@ -1,12 +1,16 @@
 var BASE_URL = '/api/search.php';
 var HOST = 'skiplagged.com';
+var fs = require('fs');
+var log = 'flights_log.txt';
 var connection = null;
+var transporter = null;
 var flight_info = {};
+var email_info = {};
 
 module.exports = Flight;
 
 function Flight(data) {
-  data.CONFIG = data.CONFIG || {};
+  data.CONFIG = config = data.CONFIG || {};
   data.RESULTS = data.RESULTS || 1;
   data.SORT = data.SORT || 'cost';
   data.RETURN_DATE = data.RETURN_DATE || '';
@@ -28,11 +32,18 @@ function Flight(data) {
 
   this.flightUrl = flight_info.flightUrl = flightUrl;
   this.return_count = flight_info.return_count = data.RESULTS;
+  this.departure = flight_info.departure = data.FROM;
   this.destination = flight_info.destination = data.TO;
   this.skip_hidden_city = flight_info.skip_hidden_city = data.SKIP_HIDDEN_CITY;
+  this.departure_date = flight_info.departure_date = data.DEPART_DATE;
+
+  email_info.USER = data.CONFIG.EMAIL.USER || '';
+  email_info.TO = data.CONFIG.EMAIL.TO || '';
+  email_info.NAME = data.CONFIG.EMAIL.NAME || 'User';
 
   if(data.SAVE_TO_DATABASE === true) {
     startMysqlConnection(data.CONFIG.MYSQL);
+    startEmailTransporter(data.CONFIG.EMAIL);
   }
 }
 
@@ -41,19 +52,19 @@ function startMysqlConnection(database_config) {
 
   if('DATABASE' in database_config === false || database_config.DATABASE.length === 0) {
     error = true;
-    console.log('Missing Database Name in Config');
+    appendLogFile("Missing Database Name in Config\n\n");
   }
   if('USERNAME' in database_config === false || database_config.USERNAME.length === 0) {
     error = true;
-    console.log('Missing Username in Config');
+    appendLogFile(" Missing Username in Config\n\n");
   }
   if('PASSWORD' in database_config === false || database_config.PASSWORD.length === 0) {
     error = true;
-    console.log('Missing Database in Config');
+    appendLogFile("Missing Database in Config\n\n");
   }
   if('HOST' in database_config === false || database_config.HOST.length === 0) {
     error = true;
-    console.log('Missing Host in Config');
+    appendLogFile("Missing Host in Config\n\n");
   }
 
   if(error === false) {
@@ -68,7 +79,7 @@ function startMysqlConnection(database_config) {
 
     connection.connect(function(err) {
       if(err) {
-        console.log(err);
+        appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
       }
       else {
         startCron();
@@ -77,61 +88,211 @@ function startMysqlConnection(database_config) {
   }
 }
 
+function startEmailTransporter(email_config) {
+  var error = false;
+
+  if(typeof email_config.SERVICE == 'undefined' || email_config.SERVICE.length === 0) {
+    error = true;
+    appendLogFile("Missing or Invalid Email Servivce Type\n\n");
+  }
+
+  if(typeof email_config.USER == 'undefined' || email_config.USER.length === 0) {
+    error = true;
+    appendLogFile("Missing or Invalid Email User");
+  }
+
+  if(typeof email_config.PASSWORD == 'undefined' || email_config.PASSWORD.length === 0) {
+    error = true;
+    appendLogFile("Missing or Invalid Email Password\n\n");
+  }
+
+  if(error === false) {
+    var nodemailer = require('nodemailer');
+
+    transporter = nodemailer.createTransport({
+  	    service: email_config.SERVICE,
+  	    auth: {
+  	        user: email_config.USER,
+  	        pass: email_config.PASSWORD
+  	    }
+  	});
+  }
+}
+
 function startCron() {
   setInterval(function() {
     flightDataQuery();
-  }, 10000);
+  }, 300000);
 }
 
 function flightDataQuery() {
-  getFlightData(flight_info.flightUrl, 1, flight_info.destination, flight_info.skip_hidden_city, function(data) {
-    insertFlightData(data.flightData);
+  var data = {
+    flightUrl: flight_info.flightUrl,
+    return_count: 1,
+    destination: flight_info.destination,
+    skip_hidden_city: flight_info.skip_hidden_city
+  };
+
+  var waterfall = require('async-waterfall');
+
+  getFlightData(data, function(error, body) {
+    waterfall([
+      function(callback) {
+        checkCurrentPrice(body.flightData);
+        callback(null);
+      },
+      function(callback) {
+        insertFlightData(body.flightData);
+        callback(null);
+      }
+    ], function(err, result) {
+      if(err) {
+        appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
+      }
+    });
   });
+}
+
+function checkCurrentPrice(flightData) {
+  var query = "SELECT MIN(price) as lowest_price from flights where from_iata = "+connection.escape(flight_info.departure)+" and to_iata = "+connection.escape(flight_info.destination) + " and date(departure_date) = "+connection.escape(flight_info.departure_date);
+
+  connection.query(query, function(err, rows) {
+    if(err) {
+      appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
+    }
+    else {
+      var lowest_price = rows[0].lowest_price;
+      if(lowest_price !== null) {
+        var subject_string = '';
+        var current_price_pennies = flightData[0].price_pennies;
+
+        if(current_price_pennies > (lowest_price * 1.05)) {
+          subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Increased ' + ((current_price_pennies / lowest_price - 1) * 100).toFixed() + '%';
+          sendEmail(flightData, subject_string);
+        }
+        else if(current_price_pennies < (lowest_price * 0.95)) {
+          subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Dropped ' + ((1 - current_price_pennies / lowest_price) * 100).toFixed() + '%';
+          sendEmail(flightData, subject_string);
+        }
+      }
+    }
+  });
+}
+
+function sendEmail(flightData, subject_string) {
+  var error = false;
+
+  if(email_info.USER.length === 0) {
+    error = true;
+    appendLogFile("Missing User Email\n\n");
+  }
+
+  if(email_info.TO.length === 0) {
+    error = true;
+    appendLogFile("Missing To Email\n\n");
+  }
+
+  if(error === false) {
+    var mailOptions = {
+  	    from:  email_info.NAME + ' <' + email_info.USER + '>',
+  	    to: email_info.TO,
+  	    subject: subject_string,
+  	    html: '<pre>'+JSON.stringify(flightData, undefined, 4)+'</pre>'
+  	};
+
+    transporter.sendMail(mailOptions, function(err, info){
+  	    if(err){
+            appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
+  	    }
+        else {
+          appendLogFile("Email Sent - " + subject_string + "\n\n");
+        }
+  	});
+  }
 }
 
 function insertFlightData(flight_data) {
   var waterfall = require('async-waterfall');
 
   var flight_id = null;
+  var flight_exists = false;
 
   waterfall([
     function(callback) {
-      var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration) VALUES (";
-      query += connection.escape(flight_data[0].flight_key)+",";
-      query += connection.escape(flight_data[0].flight_key_long)+",";
-      query += connection.escape(flight_data[0].price_pennies)+",";
-      query += connection.escape(flight_data[0].duration_seconds);
-      query += ")";
+      var query = "SELECT * from flights where flight_key_long = " + connection.escape(flight_data[0].flight_key_long) + " and price = " + connection.escape(flight_data[0].price_pennies);
 
       connection.query(query, function(error, rows) {
-        if(error) {
-          callback(error);
-        }
-        else {
-          callback(null);
-        }
+        if(rows.length > 0) flight_exists = true;
+        callback(null);
       });
     },
     function(callback) {
-      connection.query("SELECT flight_id FROM flights ORDER BY flight_id DESC LIMIT 1", function(error, rows) {
-        if(error) {
-          callback(error);
-        }
-        else {
-          flight_id = rows[0].flight_id;
+      if(flight_exists === false) {
+        var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration, departure_date, from_iata, to_iata) VALUES (";
+        query += connection.escape(flight_data[0].flight_key)+",";
+        query += connection.escape(flight_data[0].flight_key_long)+",";
+        query += connection.escape(flight_data[0].price_pennies)+",";
+        query += connection.escape(flight_data[0].duration_seconds)+",";
+        query += connection.escape(flight_data[0].legs[0].departure_time_formatted)+",";
+        query += connection.escape(flight_info.departure)+",";
+        query += connection.escape(flight_info.destination);
+        query += ")";
 
-          callback(null);
-        }
-      });
+        connection.query(query, function(error, rows) {
+          if(error) {
+            callback(error);
+          }
+          else {
+            callback(null);
+          }
+        });
+      }
+      else {
+        callback(null);
+      }
+    },
+    function(callback) {
+      if(flight_exists === false) {
+        connection.query("SELECT flight_id FROM flights ORDER BY flight_id DESC LIMIT 1", function(error, rows) {
+          if(error) {
+            callback(error);
+          }
+          else {
+            flight_id = rows[0].flight_id;
+
+            callback(null);
+          }
+        });
+      }
+      else {
+        callback(null);
+      }
     }
   ], function(err, result) {
     if(err) {
-      console.log(err);
+      appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
     }
     else {
-      console.log('Flight Inserted');
-      for(var i=0; i<flight_data[0].legs.length; i++) {
-        insertTripData(flight_id, flight_data, i);
+      if(flight_exists === false) {
+        var flight_string = "";
+
+        flight_string += "New Flight Found\n\n";
+        flight_string += "Price: " + flight_data[0].price + "\n";
+        flight_string += "Duration: " + flight_data[0].duration + "\n";
+        flight_string += "Departure DateTime: " + flight_data[0].departure_time + "\n";
+        flight_string += "Arrival DateTime: " + flight_data[0].arrival_time + "\n";
+        flight_string += "Flight Key: " + flight_data[0].flight_key + "\n";
+        flight_string += "Flight Key Long: " + flight_data[0].flight_key_long + "\n\n";
+        flight_string += "Flight Inserted\n\n";
+
+        appendLogFile(flight_string);
+
+        for(var i=0; i<flight_data[0].legs.length; i++) {
+          insertTripData(flight_id, flight_data, i);
+        }
+      }
+      else {
+        appendLogFile("Flight Already In Database\n\n");
       }
     }
   });
@@ -162,12 +323,24 @@ function insertTripData(flight_id, flight_data, leg_number) {
   query += connection.escape(flight_id);
   query += ")";
 
-  connection.query(query, function(error, rows) {
-    if(error) {
-      console.log(error);
+  connection.query(query, function(err, rows) {
+    if(err) {
+      appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
     }
     else {
-      console.log('Trip Inserted');
+      var trip_string = "";
+
+      trip_string += "New Trip\n\n";
+      trip_string += "Airline: " + current_flight.airline + "\n";
+      trip_string += "Flight Number: " + current_flight.flight_number + "\n";
+      trip_string += "Duration: " + current_flight.duration + "\n";
+      trip_string += "Departing From: " + current_flight.departing_from + "\n";
+      trip_string += "Departure DateTime: " + current_flight.departure_time + "\n";
+      trip_string += "Arriving At: " + current_flight.arriving_at + "\n";
+      trip_string += "Arrival DateTime: " + current_flight.arrival_time + "\n\n";
+      trip_string += "Trip Inserted\n\n";
+
+      appendLogFile(trip_string);
     }
   });
 }
@@ -217,11 +390,16 @@ function findTimestampDifference(start_timestamp, end_timestamp) {
   return difference;
 }
 
-function getFlightData(flightUrl, return_count, destination, skip_hidden_city, callback) {
+function getFlightData(data, callback) {
   var request = require('request');
   var airports = require('airport-codes');
-  var moment = require('moment-timezone');
   var http = require('http');
+  var moment = require('moment-timezone');
+
+  var flightUrl = data.flightUrl;
+  var return_count = data.return_count;
+  var destination = data.destination;
+  var skip_hidden_city = data.skip_hidden_city;
 
   var flights = [];
 
@@ -289,78 +467,16 @@ function getFlightData(flightUrl, return_count, destination, skip_hidden_city, c
         }
       }
 
-      callback({flightData: flights});
+      callback(null, {flightData: flights});
     });
   });
+}
 
-  /*
-  request(flightUrl, function(error, response, body) {
-    if(body) {
-      var flight_data = JSON.parse(body);
+function appendLogFile(text) {
+  var moment = require('moment-timezone');
+  var datetime = moment().tz("America/Los_Angeles").format();
 
-      for(var j=0; j<flight_data.depart.length; j++) {
-        var is_hidden_city = false;
-
-        var key = flight_data.depart[j][3];
-
-        var current_flight = {
-          price: '$' + (flight_data.depart[j][0][0] / 100).toFixed(2),
-          price_pennies: flight_data.depart[j][0][0],
-          duration: parseDurationInt(flight_data.flights[key][1]),
-          duration_seconds: flight_data.flights[key][1],
-          departure_time: '',
-          arrival_time: '',
-          legs: [],
-          flight_key: key,
-          flight_key_long: flight_data.depart[j][2]
-        };
-
-        for(var i=0; i<flight_data.flights[key][0].length; i++) {
-          if(i === (flight_data.flights[key][0].length - 1) && flight_data.flights[key][0][i][3] != destination && skip_hidden_city === true) {
-            is_hidden_city = true;
-            break;
-          }
-
-          var duration_seconds = findTimestampDifference(flight_data.flights[key][0][i][2], flight_data.flights[key][0][i][4]);
-          var duration_formatted = parseDurationInt(duration_seconds);
-
-          var airline = flight_data.airlines[flight_data.flights[key][0][i][0].substring(0, 2)];
-          var flight_number = flight_data.flights[key][0][i][0];
-          var departing_from = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('name') + ', ' + flight_data.flights[key][0][i][1] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('country');
-          var arriving_at = airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('name') + ', ' + flight_data.flights[key][0][i][3] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('country');
-          var departure_time = moment(flight_data.flights[key][0][i][2]).format('dddd, MMMM Do YYYY, hh:mma');
-          var departure_time_formatted = flight_data.flights[key][0][i][2];
-          var arrival_time = moment(flight_data.flights[key][0][i][4]).format('dddd, MMMM Do YYYY, hh:mma');
-          var arrival_time_formatted = flight_data.flights[key][0][i][4];
-          var current_leg = {airline: airline, flight_number: flight_number, duration: duration_formatted, duration_seconds: duration_seconds, departing_from: departing_from, departure_time: departure_time, departure_time_formatted: departure_time_formatted, arriving_at: arriving_at, arrival_time: arrival_time, arrival_time_formatted: arrival_time_formatted};
-
-          if(i === 0) {
-            current_flight.departure_time = departure_time;
-          }
-          else if(i === flight_data.flights[key][0].length - 1) {
-            current_flight.arrival_time = arrival_time;
-          }
-
-          current_flight.legs.push(current_leg);
-        }
-
-        if(is_hidden_city === false) {
-          flights.push(current_flight);
-        }
-
-        if(return_count === 1 && flights.length === 1) {
-          break;
-        }
-      }
-
-      callback(null, flights);
-    }
-    else {
-      console.log(error);
-      callback(error);
-    }
-  });
-  */
+  fs.appendFile(log, datetime + " " + text);
 }
 
 Flight.prototype.parseDuration = function(duration) {
@@ -376,5 +492,12 @@ Flight.prototype.getFlightUrl = function() {
 };
 
 Flight.prototype.getFlightData = function(callback) {
-  return getFlightData(this.flightUrl, this.return_count, this.destination, this.skip_hidden_city, callback);
+  var data = {
+    flightUrl: this.flightUrl,
+    return_count: this.return_count,
+    destination: this.destination,
+    skip_hidden_city: this.skip_hidden_city
+  };
+
+  return getFlightData(data, callback);
 };
