@@ -1,15 +1,39 @@
 [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-url]][daviddm-image]
 
-# Node_Skiplagged_API
+Node_Skiplagged_API
+===================
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
-# Installation
+
+Table of Contents
+=================
+ * [Installation](#installation)
+ * [Usage](#usage)
+ * [Config](#config)
+
+Installation
+============
 ```sh
-npm install examples/.
+npm install . -g
 ```
-# Usage
+Usage
+=====
 ```javascript
 var Flights = require('flights');
 var CurrentFlight = new Flights(data);
+```
+Config
+======
+Example of the config.js file
+
+```javascript
+var config = module.exports = {};
+
+config.MYSQL = {
+	DATABASE: 'flight_data',
+	USERNAME: username,
+	PASSWORD: password,
+	HOST: host
+};
 ```
 # Variables
 ## Required
