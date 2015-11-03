@@ -8,6 +8,7 @@ Table of Contents
 =================
  * [Installation](#installation)
  * [Usage](#usage)
+   * [Cheapest Flight](#cheapest-flight)
  * [Config](#config)
 
 Installation
@@ -21,6 +22,10 @@ Usage
 var Flights = require('flights');
 var CurrentFlight = new Flights(data);
 ```
+
+Cheapest Flight
+---------------
+
 Config
 ======
 Example of the config.js file
@@ -33,6 +38,13 @@ config.MYSQL = {
 	USERNAME: username,
 	PASSWORD: password,
 	HOST: host
+};
+config.EMAIL = {
+	SERVICE: service, // (ex. 'Gmail')
+	USER: user,
+	PASSWORD: password,
+	NAME: name, // Your First Name
+	TO: email // Email you want to send the flight price emails to
 };
 ```
 # Variables
