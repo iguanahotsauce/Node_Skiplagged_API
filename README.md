@@ -2,6 +2,7 @@
 
 Node_Skiplagged_API
 ===================
+
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 
 Table of Contents
@@ -380,7 +381,7 @@ Database Tracking of Flights
 ----------------------------
 With the Database Tracking functionality you can set SAVE_TO_DATABSE equal to true in your data object and the flight data for the cheapest flight in the sort order you have selected will be saved to a mysql database called flight_data. Every five minutes there will be a new request made to the [Skiplagged](http://skiplagged.com) API to retrieve new flight data.
 
-Every time new flight data is retrieved the flight price will be compared against the flight saved in the database that has the current_low flag set to "Y". If the new flight price is greater or less than the MIN_PERCENT_CHANGE value that is set in the data object then an email will be sent to the email address listed in the config file saying that the current flight price has gone up or down accordingly. It will aslo tell you the difference between the current flight price and the all time low for the specific flight in the email. When an email is sent the row associated with that flight in the database will have the current_low flag set to "Y" and all other rows for the given flight will have the current_row flag set to "N" 
+Every time new flight data is retrieved the flight price will be compared against the flight saved in the database that has the current_low flag set to "Y". If the new flight price is greater or less than the MIN_PERCENT_CHANGE value that is set in the data object then an email will be sent to the email address listed in the config file saying that the current flight price has gone up or down accordingly. It will aslo tell you the difference between the current flight price and the all time low for the specific flight in the email. When an email is sent the row associated with that flight in the database will have the current_low flag set to "Y" and all other rows for the given flight will have the current_row flag set to "N"
 
 You will need to use forever.js to keep the node script running continuestly.
 
