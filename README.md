@@ -1,15 +1,49 @@
-# Node_Skiplagged_API
+[![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-url]][daviddm-image]
+
+Node_Skiplagged_API
+===================
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
-# Installation
+
+Table of Contents
+=================
+ * [Installation](#installation)
+ * [Usage](#usage)
+   * [Cheapest Flight](#cheapest-flight)
+   * [Shortest Flight](#shortest-flight)
+   * [Least Layovers](#least-layovers)
+   * [Hidden City Flights](#hidden-city-flights)
+   * [Database Tracking of Flights](#database-tracking-of-flights)
+ * [Config](#config)
+
+Installation
+============
 ```sh
 npm install . -g
 ```
-# Usage
+Usage
+=====
 ```javascript
 var Flights = require('flights');
 var CurrentFlight = new Flights(data);
 ```
-# Config
+
+Cheapest Flight
+---------------
+
+Shortest Flight
+---------------
+
+Least Layovers
+--------------
+
+Hidden City Flights
+-------------------
+
+Database Tracking of Flights
+----------------------------
+
+Config
+======
 Example of the config.js file
 
 ```javascript
@@ -20,6 +54,13 @@ config.MYSQL = {
 	USERNAME: username,
 	PASSWORD: password,
 	HOST: host
+};
+config.EMAIL = {
+	SERVICE: service, // (ex. 'Gmail')
+	USER: user,
+	PASSWORD: password,
+	NAME: name, // Your First Name
+	TO: email // Email you want to send the flight price emails to
 };
 ```
 # Variables
@@ -172,3 +213,8 @@ var CurrentFlight = new Flights(data);
 ```
 # License
 [The MIT License](LICENSE)
+
+[travis-url]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API
+[travis-image]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API.svg?branch=master
+[daviddm-url]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API.svg?theme=shields.io
+[daviddm-image]: https://david-dm.org/iguanahotsauce/Node_Skiplagged_API
