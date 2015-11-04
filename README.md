@@ -7,18 +7,59 @@ A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 Table of Contents
 =================
  * [Installation](#installation)
+ * [Variables](#variables)
+   * [Required](#required)
+   * [Optional](#optional)
+ * [Config](#config)
  * [Usage](#usage)
    * [Cheapest Flight](#cheapest-flight)
    * [Shortest Flight](#shortest-flight)
    * [Least Layovers](#least-layovers)
    * [Hidden City Flights](#hidden-city-flights)
    * [Database Tracking of Flights](#database-tracking-of-flights)
- * [Config](#config)
+ * [License](#license)
 
 Installation
 ============
 ```sh
-npm install . -g
+$ npm install . -g
+```
+Variables
+=========
+Required
+--------
+| Variable Name  | Datatype | Description
+|----------------|----------|-----------------------------------------------------------------------------
+| FROM           | string   | Departure Airport IATA Code
+| TO             | string   | Arrival Airport IATA Code
+| DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
+Optional
+--------
+| Variable Name    | Datatype  | Default | Description
+|------------------|---------- |---------|--------------------------------------------------------------------
+| SORT             | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
+| RESULTS          | int       | 1       | 1 to Return First Result<br>0 to Return All Results
+| SKIP_HIDDEN_CITY | boolean   | true    | Removes all Hidden City Flights From the Results
+Config
+======
+Example of the config.js file
+
+```javascript
+var config = module.exports = {};
+
+config.MYSQL = {
+	DATABASE: 'flight_data',
+	USERNAME: username,
+	PASSWORD: password,
+	HOST: host
+};
+config.EMAIL = {
+	SERVICE: service, // (ex. 'Gmail')
+	USER: user,
+	PASSWORD: password,
+	NAME: name, // Your First Name
+	TO: email // Email you want to send the flight price emails to
+};
 ```
 Usage
 =====
@@ -297,46 +338,12 @@ var data = {
 var CurrentFlight = new Flights(data);
 ```
 
-```bash
+```sh
 $ forever start database_flight_tracking.js
 ```
 
-Config
-======
-Example of the config.js file
-
-```javascript
-var config = module.exports = {};
-
-config.MYSQL = {
-	DATABASE: 'flight_data',
-	USERNAME: username,
-	PASSWORD: password,
-	HOST: host
-};
-config.EMAIL = {
-	SERVICE: service, // (ex. 'Gmail')
-	USER: user,
-	PASSWORD: password,
-	NAME: name, // Your First Name
-	TO: email // Email you want to send the flight price emails to
-};
-```
-# Variables
-## Required
-| Variable Name  | Datatype | Description
-|----------------|----------|-----------------------------------------------------------------------------
-| FROM           | string   | Departure Airport IATA Code
-| TO             | string   | Arrival Airport IATA Code
-| DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
-##Optional
-| Variable Name    | Datatype  | Default | Description
-|------------------|---------- |---------|--------------------------------------------------------------------
-| SORT             | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
-| RESULTS          | int       | 1       | 1 to Return First Result<br>0 to Return All Results
-| SKIP_HIDDEN_CITY | boolean   | true    | Removes all Hidden City Flights From the Results
-
-# License
+License
+=======
 [The MIT License](LICENSE)
 
 [travis-url]: https://travis-ci.org/iguanahotsauce/Node_Skiplagged_API
