@@ -29,6 +29,7 @@ var CurrentFlight = new Flights(data);
 
 Cheapest Flight
 ---------------
+### Example
 ```javascript
 var Flights = require('flights');
 
@@ -102,6 +103,7 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 Shortest Flight
 ---------------
+### Example
 ```javascript
 var Flights = require('flights');
 
@@ -152,6 +154,7 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 Least Layovers
 --------------
+### Example
 ```javascript
 var Flights = require('flights');
 
@@ -202,6 +205,13 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 Hidden City Flights
 -------------------
+Hidden city ticketing occurs when a passenger disembarks an indirect flight at the connection node. Flight fares are subject to market forces, and therefore do not necessarily correlate to the distance flown. As a result, a flight between point A to point C, with a connection node at point B, might be cheaper than a flight between point A and point B. It is then possible to purchase a flight ticket from point A to point C, disembark at the connection node (B) and discard the remaining segment (B to C).
+
+Using the hidden city tactic is usually practical only for one-way trips, as the airlines will cancel the subsequent parts of the trip once a traveler has disembarked. Thus, round-trip itineraries need to be created by piecing two one-way flights together. This tactic also requires that the traveler have carry-on luggage only, as any checked baggage items will be unloaded only at the flight's ticketed final destination.
+
+[Wikipedia](https://en.wikipedia.org/wiki/Airline_booking_ploys#Hidden_city_ticketing)
+
+### Example
 ```javascript
 var Flights = require('flights');
 
@@ -264,6 +274,32 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 Database Tracking of Flights
 ----------------------------
+With the Database Tracking functionality you can set SAVE_TO_DATABSE equal to true in your data object and the flight data for the cheapest flight in the sort order you have selected will be saved to a mysql database called flight_data. Every five minutes there will be a new request made to the [Skiplagged](http://skiplagged.com) API to retrieve new flight data.
+
+Every time new flight data is retrieved the flight price will be compared against the flight saved in the database that has the current_low flag set to "Y". If the new flight price is greater or less than the MIN_PERCENT_CHANGE value that is set in the data object then an email will be sent to the email address listed in the config file saying that the current flight price has gone up or down accordingly. It will aslo tell you the difference between the current flight price and the all time low for the specific flight in the email. When an email is sent the row associated with that flight in the database will have the current_low flag set to "Y" and all other rows for the given flight will have the current_row flag set to "N" 
+
+You will need to use forever.js to keep the node script running continuestly.
+
+### Example
+
+```javascript
+var Flights = require('../index');
+var config = require('./config');
+
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPART_DATE: '2016-06-01',
+  SAVE_TO_DATABASE: true,
+  CONFIG: config
+};
+
+var CurrentFlight = new Flights(data);
+```
+
+```bash
+$ forever start database_flight_tracking.js
+```
 
 Config
 ======
@@ -299,35 +335,7 @@ config.EMAIL = {
 | SORT             | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
 | RESULTS          | int       | 1       | 1 to Return First Result<br>0 to Return All Results
 | SKIP_HIDDEN_CITY | boolean   | true    | Removes all Hidden City Flights From the Results
-#Hidden City Ticketing
-Hidden city ticketing occurs when a passenger disembarks an indirect flight at the connection node. Flight fares are subject to market forces, and therefore do not necessarily correlate to the distance flown. As a result, a flight between point A to point C, with a connection node at point B, might be cheaper than a flight between point A and point B. It is then possible to purchase a flight ticket from point A to point C, disembark at the connection node (B) and discard the remaining segment (B to C).
 
-Using the hidden city tactic is usually practical only for one-way trips, as the airlines will cancel the subsequent parts of the trip once a traveler has disembarked. Thus, round-trip itineraries need to be created by piecing two one-way flights together. This tactic also requires that the traveler have carry-on luggage only, as any checked baggage items will be unloaded only at the flight's ticketed final destination.
-
-[Wikipedia](https://en.wikipedia.org/wiki/Airline_booking_ploys#Hidden_city_ticketing)
-# Example
-## Database Tracking
-With the Database Tracking functionality you can set SAVE_TO_DATABSE equal to true in your data object and the flight data will be saved to a mysql database. Every five minutes there will be a new request made to the [Skiplagged](http://skiplagged.com) API to retrieve new flight data.
-
-Every time new flight data is retrieved the flight price will be compared against the saved flight prices in the database and if the new flight price is below the price trend an email will be sent to the email address that is set in the config file saying that the prices have dropped and now is a good time to book the flight.
-
-Data will be collected for the number of days set in the config file, DAYS_BEFORE_COMPARISON, before sending the price emails so that a good base line is set.
-
-```javascript
-var Flights = require('../index');
-var config = require('./config');
-
-var data = {
-  FROM: 'PDX',
-  TO: 'JFK',
-  DEPART_DATE: '2016-06-01',
-  SKIP_HIDDEN_CITY: false,
-  SAVE_TO_DATABASE: true,
-  CONFIG: config
-};
-
-var CurrentFlight = new Flights(data);
-```
 # License
 [The MIT License](LICENSE)
 
