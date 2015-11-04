@@ -13,6 +13,7 @@ Table of Contents
  * [Config](#config)
  * [Usage](#usage)
    * [Cheapest Flight](#cheapest-flight)
+     * [Example](#example)
    * [Shortest Flight](#shortest-flight)
    * [Least Layovers](#least-layovers)
    * [Hidden City Flights](#hidden-city-flights)
