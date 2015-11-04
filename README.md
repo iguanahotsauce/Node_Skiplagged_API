@@ -15,6 +15,7 @@ Table of Contents
    * [Cheapest Flight](#cheapest-flight)
      * [Example](#example)
    * [Shortest Flight](#shortest-flight)
+     * [Example](#example)
    * [Least Layovers](#least-layovers)
    * [Hidden City Flights](#hidden-city-flights)
    * [Database Tracking of Flights](#database-tracking-of-flights)
