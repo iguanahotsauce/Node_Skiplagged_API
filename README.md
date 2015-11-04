@@ -15,10 +15,13 @@ Table of Contents
    * [Cheapest Flight](#cheapest-flight)
      * [Example](#example)
    * [Shortest Flight](#shortest-flight)
-     * [Example](#shortest-flight #example)
+     * [Example](#example-1)
    * [Least Layovers](#least-layovers)
+     * [Example](#example-2)
    * [Hidden City Flights](#hidden-city-flights)
+     * [Example](#example-3)
    * [Database Tracking of Flights](#database-tracking-of-flights)
+     * [Example](#example-4)
  * [License](#license)
 
 Installation
