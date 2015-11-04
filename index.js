@@ -16,7 +16,6 @@ function Flight(data) {
   data.RETURN_DATE = data.RETURN_DATE || '';
   data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
   data.SAVE_TO_DATABASE = 'SAVE_TO_DATABASE' in data ? data.SAVE_TO_DATABASE : false;
-  data.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE || 0;
 
   var flightUrl = BASE_URL;
 
@@ -38,13 +37,17 @@ function Flight(data) {
   this.skip_hidden_city = flight_info.skip_hidden_city = data.SKIP_HIDDEN_CITY;
   this.departure_date = flight_info.departure_date = data.DEPART_DATE;
 
-  flight_info.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE;
-
-  email_info.USER = data.CONFIG.EMAIL.USER || '';
-  email_info.TO = data.CONFIG.EMAIL.TO || '';
-  email_info.NAME = data.CONFIG.EMAIL.NAME || 'User';
-
   if(data.SAVE_TO_DATABASE === true) {
+    data.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE || 0;
+    data.CONFIG.EMAIL = data.CONFIG.EMAIL || {};
+    data.CONFIG.MYSQL = data.CONFIG.MYSQL || {};
+
+    flight_info.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE;
+
+    email_info.USER = data.CONFIG.EMAIL.USER || '';
+    email_info.TO = data.CONFIG.EMAIL.TO || '';
+    email_info.NAME = data.CONFIG.EMAIL.NAME || 'User';
+
     startMysqlConnection(data.CONFIG.MYSQL);
     startEmailTransporter(data.CONFIG.EMAIL);
   }

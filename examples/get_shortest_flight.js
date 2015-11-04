@@ -4,8 +4,8 @@ var config = require('./config');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPART_DATE: '2016-06-30',
-  SKIP_HIDDEN_CITY: false
+  DEPART_DATE: '2016-06-01',
+  SORT: 'duration'
 };
 
 var CurrentFlight = new Flights(data);
