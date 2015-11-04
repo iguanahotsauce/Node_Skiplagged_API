@@ -13,6 +13,8 @@ create table flight_data.flights (
   from_iata VARCHAR(5) NOT NULL,
   to_iata VARCHAR(5) NOT NULL,
   departure_date DATETIME NOT NULL,
+  current_low VARCHAR(1) DEFAULT 'N' NOT NULL,
+  insert_date DATETIME NOT NULL,
   PRIMARY KEY(flight_id)
 );
 
