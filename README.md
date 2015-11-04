@@ -2,12 +2,12 @@
 
 Node_Skiplagged_API
 ===================
-
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 
 Table of Contents
 =================
  * [Installation](#installation)
+<<<<<<< HEAD
  * [Variables](#variables)
    * [Required](#required)
    * [Optional](#optional)
@@ -32,16 +32,57 @@ Table of Contents
    * [Database Tracking of Flights](#database-tracking-of-flights)
      * [Example](#example-4)
  * [License](#license)
+=======
+ * [Usage](#usage)
+   * [Cheapest Flight](#cheapest-flight)
+ * [Config](#config)
+>>>>>>> c434576eefe98bcc156ea8dfcb480ae1c23957bc
 
 Installation
 ============
 ```sh
 $ npm install . -g
 ```
+<<<<<<< HEAD
 Variables
 =========
 Required
 --------
+=======
+Usage
+=====
+```javascript
+var Flights = require('flights');
+var CurrentFlight = new Flights(data);
+```
+
+Cheapest Flight
+---------------
+
+Config
+======
+Example of the config.js file
+
+```javascript
+var config = module.exports = {};
+
+config.MYSQL = {
+	DATABASE: 'flight_data',
+	USERNAME: username,
+	PASSWORD: password,
+	HOST: host
+};
+config.EMAIL = {
+	SERVICE: service, // (ex. 'Gmail')
+	USER: user,
+	PASSWORD: password,
+	NAME: name, // Your First Name
+	TO: email // Email you want to send the flight price emails to
+};
+```
+# Variables
+## Required
+>>>>>>> c434576eefe98bcc156ea8dfcb480ae1c23957bc
 | Variable Name  | Datatype | Description
 |----------------|----------|-----------------------------------------------------------------------------
 | FROM           | string   | Departure Airport IATA Code
