@@ -16,6 +16,7 @@ function Flight(data) {
   data.RETURN_DATE = data.RETURN_DATE || '';
   data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
   data.SAVE_TO_DATABASE = 'SAVE_TO_DATABASE' in data ? data.SAVE_TO_DATABASE : false;
+  data.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE || 0;
 
   var flightUrl = BASE_URL;
 
@@ -36,6 +37,8 @@ function Flight(data) {
   this.destination = flight_info.destination = data.TO;
   this.skip_hidden_city = flight_info.skip_hidden_city = data.SKIP_HIDDEN_CITY;
   this.departure_date = flight_info.departure_date = data.DEPART_DATE;
+
+  flight_info.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE;
 
   email_info.USER = data.CONFIG.EMAIL.USER || '';
   email_info.TO = data.CONFIG.EMAIL.TO || '';
@@ -154,27 +157,78 @@ function flightDataQuery() {
 }
 
 function checkCurrentPrice(flightData) {
-  var query = "SELECT MIN(price) as lowest_price from flights where from_iata = "+connection.escape(flight_info.departure)+" and to_iata = "+connection.escape(flight_info.destination) + " and date(departure_date) = "+connection.escape(flight_info.departure_date);
+  var all_time_low_query = "SELECT MIN(price) as lowest_price from flights where from_iata = "+connection.escape(flight_info.departure)+" and to_iata = "+connection.escape(flight_info.destination) + " and date(departure_date) = "+connection.escape(flight_info.departure_date);
+  var current_low_query = "SELECT price from flights where from_iata = "+connection.escape(flight_info.departure)+" and to_iata = "+connection.escape(flight_info.destination) + " and date(departure_date) = "+connection.escape(flight_info.departure_date) + " and current_low = " + connection.escape("y");
 
+  var current_low = null;
+  var all_time_low = null;
+
+  var waterfall = require('async-waterfall');
+
+  waterfall([
+    function(callback) {
+      connection.query(current_low_query, function(err, rows) {
+        if(err) {
+          callback(err);
+        }
+        else if(rows.length === 0) {
+          callback({error: 'No Current Low Found'});
+        }
+        else {
+          current_low = rows[0].price;
+        }
+      });
+    },
+    function(callback) {
+      connection.query(all_time_low_query, function(err, rows) {
+        if(err) {
+          callback(err);
+        }
+        else {
+          if(rows.length !== 0) {
+            all_time_low = rows[0].lowest_price;
+          }
+
+          callback(null);
+        }
+      });
+    }
+  ],
+  function(err, result) {
+    if(err) {
+      appendFile(JSON.stringify(err, undefined, 4) + "\n\n");
+    }
+    else if(current_low !== null) {
+      var subject_string = '';
+      var current_price_pennies = flightData[0].price_pennies;
+
+      if(current_price_pennies > (current_low * (1 + flight_info.MIN_PERCENT_CHANGE))) {
+        subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Increased ' + ((current_price_pennies / current_low - 1) * 100).toFixed() + '%';
+
+        if(all_time_low !== null) {
+          subject_string += ' Up ' + ((current_price_pennies / all_time_low - 1) * 100).toFixed() + '% From The All Time Low of $' + (all_time_low / 100).toFixed(1);
+        }
+
+        sendEmail(flightData, subject_string);
+      }
+      else if(current_price_pennies < (current_low * (1 - flight_info.MIN_PERCENT_CHANGE))) {
+        subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Dropped ' + ((1 - current_price_pennies / current_low) * 100).toFixed() + '%';
+
+        if(all_time_low !== null) {
+          subject_string += ' Down ' + ((current_price_pennies / all_time_low - 1) * 100).toFixed() + '% From The All Time Low of $' + (all_time_low / 100).toFixed(1);
+        }
+
+        sendEmail(flightData, subject_string);
+      }
+    }
+  });
   connection.query(query, function(err, rows) {
     if(err) {
       appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
     }
     else {
       var lowest_price = rows[0].lowest_price;
-      if(lowest_price !== null) {
-        var subject_string = '';
-        var current_price_pennies = flightData[0].price_pennies;
 
-        if(current_price_pennies > (lowest_price * 1.05)) {
-          subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Increased ' + ((current_price_pennies / lowest_price - 1) * 100).toFixed() + '%';
-          sendEmail(flightData, subject_string);
-        }
-        else if(current_price_pennies < (lowest_price * 0.95)) {
-          subject_string = 'Flight Price for ' + flight_info.departure + ' To ' + flight_info.destination + ' Dropped ' + ((1 - current_price_pennies / lowest_price) * 100).toFixed() + '%';
-          sendEmail(flightData, subject_string);
-        }
-      }
     }
   });
 }
@@ -228,14 +282,30 @@ function insertFlightData(flight_data) {
     },
     function(callback) {
       if(flight_exists === false) {
-        var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration, departure_date, from_iata, to_iata) VALUES (";
+        var query = "UPDATE flights SET current_low = " + connection.escape("N") + " where from_iata = " +connection.escape(flight_info.departure) + " and to_iata = " + connection.escape(flight_info.destination);
+
+        connection.query(query, function(err, rows) {
+          if(err) {
+            callback(err);
+          }
+          else {
+            callback(null);
+          }
+        });
+      }
+    },
+    function(callback) {
+      if(flight_exists === false) {
+        var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration, departure_date, from_iata, to_iata, current_low, insert_date) VALUES (";
         query += connection.escape(flight_data[0].flight_key)+",";
         query += connection.escape(flight_data[0].flight_key_long)+",";
         query += connection.escape(flight_data[0].price_pennies)+",";
         query += connection.escape(flight_data[0].duration_seconds)+",";
         query += connection.escape(flight_data[0].legs[0].departure_time_formatted)+",";
         query += connection.escape(flight_info.departure)+",";
-        query += connection.escape(flight_info.destination);
+        query += connection.escape(flight_info.destination)+",";
+        query += connection.escape("Y")+",";
+        query += connection.escape("NOW()");
         query += ")";
 
         connection.query(query, function(error, rows) {
@@ -475,7 +545,7 @@ function getFlightData(data, callback) {
 function appendLogFile(text) {
   var moment = require('moment-timezone');
   var datetime = moment().tz("America/Los_Angeles").format();
-
+  console.log(datetime);
   fs.appendFile(log, datetime + " " + text);
 }
 
