@@ -29,16 +29,239 @@ var CurrentFlight = new Flights(data);
 
 Cheapest Flight
 ---------------
+```javascript
+var Flights = require('flights');
 
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2016-06-01'
+};
+
+var CurrentFlight = new Flights(data);
+
+CurrentFlight.getFlightData(function(error, body) {
+  body = JSON.stringify(body, undefined, 4);
+  console.log(body);
+});
+```
+### Response
+```json
+{
+    "flightData": [
+        {
+            "price": "$175.60",
+            "price_pennies": 17560,
+            "duration": "10 Hours 22 Minutes",
+            "duration_seconds": 37320,
+            "departure_time": "Thursday, June 2nd 2016, 01:59am",
+            "arrival_time": "Thursday, June 2nd 2016, 12:21pm",
+            "legs": [
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL1067",
+                    "duration": "4 Hours 8 Minutes",
+                    "duration_seconds": 14880,
+                    "departing_from": "Portland Intl, PDX, Portland, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 01:59am",
+                    "departure_time_formatted": "2016-06-01T22:59:00-07:00",
+                    "arriving_at": "Detroit Metro Wayne Co, DTW, Detroit, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 06:07am",
+                    "arrival_time_formatted": "2016-06-02T06:07:00-04:00"
+                },
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL1218",
+                    "duration": "1 Hour 25 Minutes",
+                    "duration_seconds": 5100,
+                    "departing_from": "Detroit Metro Wayne Co, DTW, Detroit, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 07:33am",
+                    "departure_time_formatted": "2016-06-02T07:33:00-04:00",
+                    "arriving_at": "Ronald Reagan Washington Natl, DCA, Washington, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 08:58am",
+                    "arrival_time_formatted": "2016-06-02T08:58:00-04:00"
+                },
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL3901",
+                    "duration": "1 Hour 21 Minutes",
+                    "duration_seconds": 4860,
+                    "departing_from": "Ronald Reagan Washington Natl, DCA, Washington, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 11:00am",
+                    "departure_time_formatted": "2016-06-02T11:00:00-04:00",
+                    "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 12:21pm",
+                    "arrival_time_formatted": "2016-06-02T12:21:00-04:00"
+                }
+            ],
+            "flight_key": "b38b98d",
+            "flight_key_long": "4d7ded7b19fd4946b25526c94ef76a361e0e4fab833405e541499eaf68968ede342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624eb22eaa7994c1341c962d7016e47b88cda641311e446a3bd68e2714c1b1dbc2f6"
+        }
+    ]
+}
+```
 Shortest Flight
 ---------------
+```javascript
+var Flights = require('flights');
 
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2016-06-01',
+  SORT: 'duration'
+};
+
+var CurrentFlight = new Flights(data);
+
+CurrentFlight.getFlightData(function(error, body) {
+  body = JSON.stringify(body, undefined, 4);
+  console.log(body);
+});
+```
+### Response
+```json
+{
+    "flightData": [
+        {
+            "price": "$181.10",
+            "price_pennies": 18110,
+            "duration": "5 Hours 20 Minutes",
+            "duration_seconds": 19200,
+            "departure_time": "Wednesday, June 1st 2016, 09:00am",
+            "arrival_time": "",
+            "legs": [
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL735",
+                    "duration": "5 Hours 20 Minutes",
+                    "duration_seconds": 19200,
+                    "departing_from": "Portland Intl, PDX, Portland, United States",
+                    "departure_time": "Wednesday, June 1st 2016, 09:00am",
+                    "departure_time_formatted": "2016-06-01T06:00:00-07:00",
+                    "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
+                    "arrival_time": "Wednesday, June 1st 2016, 02:20pm",
+                    "arrival_time_formatted": "2016-06-01T14:20:00-04:00"
+                }
+            ],
+            "flight_key": "e426142",
+            "flight_key_long": "230be59fb91c9257bc546e3d8ddc621ba49444ed90a0dbfaa0cbbe07ba4c28e418472b2910486da4ee5f0eae220994110f11e453b00b28473277d9171cd4fe2cbb38c34ba75f2305687e7231ac6c1712c5b022ed880f942320d3a3267d8d0ec3"
+        }
+    ]
+}
+```
 Least Layovers
 --------------
+```javascript
+var Flights = require('flights');
 
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2016-06-01',
+  SORT: 'path'
+};
+
+var CurrentFlight = new Flights(data);
+
+CurrentFlight.getFlightData(function(error, body) {
+  body = JSON.stringify(body, undefined, 4);
+  console.log(body);
+});
+```
+### Response
+```json
+{
+    "flightData": [
+        {
+            "price": "$181.10",
+            "price_pennies": 18110,
+            "duration": "5 Hours 20 Minutes",
+            "duration_seconds": 19200,
+            "departure_time": "Wednesday, June 1st 2016, 09:00am",
+            "arrival_time": "",
+            "legs": [
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL735",
+                    "duration": "5 Hours 20 Minutes",
+                    "duration_seconds": 19200,
+                    "departing_from": "Portland Intl, PDX, Portland, United States",
+                    "departure_time": "Wednesday, June 1st 2016, 09:00am",
+                    "departure_time_formatted": "2016-06-01T06:00:00-07:00",
+                    "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
+                    "arrival_time": "Wednesday, June 1st 2016, 02:20pm",
+                    "arrival_time_formatted": "2016-06-01T14:20:00-04:00"
+                }
+            ],
+            "flight_key": "e426142",
+            "flight_key_long": "f88ef61cc3e0fd72879c3a4bbecca602791bf6d3b8f6a147c078f94e9e49f66c342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624e57ebe4f3af8eeda37c9a463907102d5d4b41411986645b404640faa406a1a612"
+        }
+    ]
+}
+```
 Hidden City Flights
 -------------------
+```javascript
+var Flights = require('flights');
 
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2016-06-01',
+  SKIP_HIDDEN_CITY: false
+};
+
+var CurrentFlight = new Flights(data);
+
+CurrentFlight.getFlightData(function(error, body) {
+  body = JSON.stringify(body, undefined, 4);
+  console.log(body);
+});
+```
+### Response
+```json
+{
+    "flightData": [
+        {
+            "price": "$112.60",
+            "price_pennies": 11260,
+            "duration": "5 Hours 13 Minutes",
+            "duration_seconds": 18780,
+            "departure_time": "Thursday, June 2nd 2016, 12:55am",
+            "arrival_time": "Thursday, June 2nd 2016, 10:07am",
+            "legs": [
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL1627",
+                    "duration": "5 Hours 13 Minutes",
+                    "duration_seconds": 18780,
+                    "departing_from": "Portland Intl, PDX, Portland, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 12:55am",
+                    "departure_time_formatted": "2016-06-01T21:55:00-07:00",
+                    "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 06:08am",
+                    "arrival_time_formatted": "2016-06-02T06:08:00-04:00"
+                },
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL4022",
+                    "duration": "1 Hour 22 Minutes",
+                    "duration_seconds": 4920,
+                    "departing_from": "John F Kennedy Intl, JFK, New York, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 08:45am",
+                    "departure_time_formatted": "2016-06-02T08:45:00-04:00",
+                    "arriving_at": "Ronald Reagan Washington Natl, DCA, Washington, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 10:07am",
+                    "arrival_time_formatted": "2016-06-02T10:07:00-04:00"
+                }
+            ],
+            "flight_key": "02aeb3b",
+            "flight_key_long": "4d7ded7b19fd4946b25526c94ef76a3634ed8fac852a28bece2368b73ee2800f342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624e1ab655e8c04b940a225885a82b1f830654cb1f97b1f4a3a9cf7abda9e5873ed3"
+        }
+    ]
+}
+```
 Database Tracking of Flights
 ----------------------------
 
@@ -83,112 +306,6 @@ Using the hidden city tactic is usually practical only for one-way trips, as the
 
 [Wikipedia](https://en.wikipedia.org/wiki/Airline_booking_ploys#Hidden_city_ticketing)
 # Example
-##Normal Flight
-```javascript
-var Flights = require('flights');
-
-var data = {
-  FROM: 'PDX',
-  TO: 'JFK',
-  DEPARTURE_DATE: '2015-10-25'
-};
-
-var CurrentFlight = new Flights(data);
-
-CurrentFlight.getFlightData(function(error, body) {
-  body = JSON.stringify(body, undefined, 4);
-  console.log(body);
-});
-```
-### Response
-```json
-[
-    {
-        "price": "$230.50",
-        "duration": "7 Hours 36 Minutes",
-        "departure_time": "Sunday, October 25th 2015, 03:25am",
-        "arrival_time": "Sunday, October 25th 2015, 11:01am",
-        "legs": [
-            {
-                "airline": "American Airlines",
-                "flight_number": "AA1905",
-                "duration": "4 Hours 49 Minutes",
-                "departing_from": "Portland Intl, PDX, Portland, United States",
-                "departure_time": "Sunday, October 25th 2015, 03:25am",
-                "arriving_at": "Charlotte Douglas Intl, CLT, Charlotte, United States",
-                "arrival_time": "Sunday, October 25th 2015, 08:14am"
-            },
-            {
-                "airline": "American Airlines",
-                "flight_number": "AA1830",
-                "duration": "1 Hour 46 Minutes",
-                "departing_from": "Charlotte Douglas Intl, CLT, Charlotte, United States",
-                "departure_time": "Sunday, October 25th 2015, 09:15am",
-                "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
-                "arrival_time": "Sunday, October 25th 2015, 11:01am"
-            }
-        ]
-    }
-]
-```
-##Hidden City Flight
-```javascript
-var Flights = require('flights');
-
-var data = {
-  FROM: 'PDX',
-  TO: 'JFK',
-  DEPARTURE_DATE: '2015-10-25',
-  SKIP_HIDDEN_CITY: false
-};
-
-var CurrentFlight = new Flights(data);
-
-CurrentFlight.getFlightData(function(error, body) {
-  body = JSON.stringify(body, undefined, 4);
-  console.log(body);
-});
-```
-### Response
-```json
-[
-    {
-        "price": "$189.30",
-        "duration": "8 Hours 41 Minutes",
-        "departure_time": "Sunday, October 25th 2015, 09:27pm",
-        "arrival_time": "Monday, October 26th 2015, 11:47am",
-        "legs": [
-            {
-                "airline": "Delta Air Lines",
-                "flight_number": "DL2389",
-                "duration": "1 Hour 43 Minutes",
-                "departing_from": "Portland Intl, PDX, Portland, United States",
-                "departure_time": "Sunday, October 25th 2015, 09:27pm",
-                "arriving_at": "Salt Lake City Intl, SLC, Salt Lake City, United States",
-                "arrival_time": "Sunday, October 25th 2015, 11:10pm"
-            },
-            {
-                "airline": "Delta Air Lines",
-                "flight_number": "DL1264",
-                "duration": "4 Hours 23 Minutes",
-                "departing_from": "Salt Lake City Intl, SLC, Salt Lake City, United States",
-                "departure_time": "Monday, October 26th 2015, 01:45am",
-                "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
-                "arrival_time": "Monday, October 26th 2015, 06:08am"
-            },
-            {
-                "airline": "Delta Air Lines",
-                "flight_number": "DL457",
-                "duration": "3 Hours 12 Minutes",
-                "departing_from": "John F Kennedy Intl, JFK, New York, United States",
-                "departure_time": "Monday, October 26th 2015, 08:35am",
-                "arriving_at": "Lynden Pindling Intl, NAS, Nassau, Bahamas",
-                "arrival_time": "Monday, October 26th 2015, 11:47am"
-            }
-        ]
-    }
-]
-```
 ## Database Tracking
 With the Database Tracking functionality you can set SAVE_TO_DATABSE equal to true in your data object and the flight data will be saved to a mysql database. Every five minutes there will be a new request made to the [Skiplagged](http://skiplagged.com) API to retrieve new flight data.
 
