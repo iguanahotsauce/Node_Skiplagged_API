@@ -12,8 +12,8 @@ Table of Contents
    * [Optional](#optional)
  * [Config](#config)
  * [Database Schema](#database-schema)
-   * [Database](#database)
-   * [Tables](#tables)
+   * [Database Name](#database-name)
+   * [Table Names](#table-names)
    * [Table Schema](#table-schema)
  * [Usage](#usage)
    * [Cheapest Flight](#cheapest-flight)
@@ -78,12 +78,12 @@ config.EMAIL = {
 ```
 Database Schema
 ===============
-Database
+Database Name
 --------
 ```mysql
 flight_data
 ```
-Tables
+Table Names
 ------
 ```mysql
 flights
