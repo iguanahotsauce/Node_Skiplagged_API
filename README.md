@@ -11,6 +11,10 @@ Table of Contents
    * [Required](#required)
    * [Optional](#optional)
  * [Config](#config)
+ * [Database Schema](#database-schema)
+   * [Database](#database)
+   * [Tables](#tables)
+   * [Table Schema](#table-schema)
  * [Usage](#usage)
    * [Cheapest Flight](#cheapest-flight)
      * [Example](#example)
@@ -44,11 +48,13 @@ Required
 | DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
 Optional
 --------
-| Variable Name    | Datatype  | Default | Description
-|------------------|---------- |---------|--------------------------------------------------------------------
-| SORT             | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
-| RESULTS          | int       | 1       | 1 to Return First Result<br>0 to Return All Results
-| SKIP_HIDDEN_CITY | boolean   | true    | Removes all Hidden City Flights From the Results
+| Variable Name      | Datatype  | Default | Description
+|--------------------|---------- |---------|--------------------------------------------------------------------
+| SORT               | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
+| RESULTS            | int       | 1       | 1 to Return First Result<br>0 to Return All Results
+| SKIP_HIDDEN_CITY   | boolean   | true    | Removes all Hidden City Flights From the Results
+| CONFIG             | object    | {}      | Object that stores data for mysql login and email login
+| MIN_PERCENT_CHANGE | float     | 0       | The percent change needed between the lowest flight price and the current flight price to send an email
 Config
 ======
 Example of the config.js file
@@ -69,6 +75,54 @@ config.EMAIL = {
 	NAME: name, // Your First Name
 	TO: email // Email you want to send the flight price emails to
 };
+```
+Database Schema
+===============
+Database
+--------
+```mysql
+flight_data
+```
+Tables
+------
+```mysql
+flights
+trips
+```
+Table Schema
+------------
+```mysql
+mysql> desc flights;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| flight_id       | mediumint(9) | NO   | PRI | NULL    | auto_increment |
+| flight_key      | varchar(7)   | NO   |     | NULL    |                |
+| flight_key_long | varchar(192) | NO   |     | NULL    |                |
+| duration        | mediumint(9) | NO   |     | NULL    |                |
+| price           | mediumint(9) | NO   |     | NULL    |                |
+| from_iata       | varchar(5)   | NO   |     | NULL    |                |
+| to_iata         | varchar(5)   | NO   |     | NULL    |                |
+| departure_date  | datetime     | NO   |     | NULL    |                |
+| insert_date     | datetime     | NO   |     | NULL    |                |
+| current_low     | varchar(1)   | NO   |     | N       |                |
++-----------------+--------------+------+-----+---------+----------------+
+
+mysql> desc trips;
++------------------------+--------------+------+-----+---------------------+-----------------------------+
+| Field                  | Type         | Null | Key | Default             | Extra                       |
++------------------------+--------------+------+-----+---------------------+-----------------------------+
+| trip_id                | mediumint(9) | NO   | PRI | NULL                | auto_increment              |
+| flight_number          | varchar(10)  | NO   |     | NULL                |                             |
+| airline                | varchar(100) | NO   |     | NULL                |                             |
+| duration               | mediumint(9) | NO   |     | NULL                |                             |
+| departure_airport_iata | varchar(5)   | NO   |     | NULL                |                             |
+| departure_time         | timestamp    | NO   |     | CURRENT_TIMESTAMP   | on update CURRENT_TIMESTAMP |
+| arrival_airport_iata   | varchar(5)   | NO   |     | NULL                |                             |
+| arrival_time           | timestamp    | NO   |     | 0000-00-00 00:00:00 |                             |
+| flight_id              | mediumint(9) | NO   | MUL | NULL                |                             |
++------------------------+--------------+------+-----+---------------------+-----------------------------+
+
 ```
 Usage
 =====
