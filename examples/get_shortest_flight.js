@@ -1,9 +1,11 @@
-var Flights = require('flights');
+var Flights = require('../index');
+var config = require('./config');
 
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPART_DATE: '2015-10-25'
+  DEPART_DATE: '2016-06-01',
+  SORT: 'duration'
 };
 
 var CurrentFlight = new Flights(data);
