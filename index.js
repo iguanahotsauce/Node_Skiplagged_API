@@ -183,8 +183,6 @@ function checkCurrentPrice(flightData) {
           callback(err);
         }
         else if(rows.length === 0) {
-          current_low = null;
-
           appendLogFile("No row in the db for the current flight, don't check price for email\n\n");
 
           callback(null);
