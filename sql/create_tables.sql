@@ -14,7 +14,8 @@ create table flight_data.flights (
   to_iata VARCHAR(5) NOT NULL,
   departure_date DATETIME NOT NULL,
   current_low VARCHAR(1) DEFAULT 'N' NOT NULL,
-  insert_date DATETIME NOT NULL,
+  hidden_city VARCHAR(1) NOT NULL,
+  insert_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   PRIMARY KEY(flight_id)
 );
 

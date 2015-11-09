@@ -85,6 +85,8 @@ function startMysqlConnection(database_config) {
 
     connection.connect(function(err) {
       if(err) {
+        err.message = "mysql connection";
+
         appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
       }
       else {
@@ -145,14 +147,18 @@ function flightDataQuery() {
     waterfall([
       function(callback) {
         checkCurrentPrice(body.flightData);
+
         callback(null);
       },
       function(callback) {
         insertFlightData(body.flightData);
+
         callback(null);
       }
     ], function(err, result) {
       if(err) {
+        err.message = "flightDataQuery getFlightData";
+
         appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
       }
     });
@@ -172,19 +178,28 @@ function checkCurrentPrice(flightData) {
     function(callback) {
       connection.query(current_low_query, function(err, rows) {
         if(err) {
+          err.message = "select price from flights where from_iata and to_iata and dat(departure_date) and current_low = Y";
+
           callback(err);
         }
         else if(rows.length === 0) {
-          callback({error: 'No Current Low Found'});
+          current_low = null;
+
+          appendLogFile("No row in the db for the current flight, don't check price for email\n\n");
+
+          callback(null);
         }
         else {
           current_low = rows[0].price;
+          callback(null);
         }
       });
     },
     function(callback) {
       connection.query(all_time_low_query, function(err, rows) {
         if(err) {
+          err.message = "select min(price) as lowest_price from flights where from_iata and to_iata and date(departure_date)";
+
           callback(err);
         }
         else {
@@ -199,7 +214,7 @@ function checkCurrentPrice(flightData) {
   ],
   function(err, result) {
     if(err) {
-      appendFile(JSON.stringify(err, undefined, 4) + "\n\n");
+      appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
     }
     else if(current_low !== null) {
       var subject_string = '';
@@ -223,15 +238,6 @@ function checkCurrentPrice(flightData) {
 
         sendEmail(flightData, subject_string);
       }
-    }
-  });
-  connection.query(query, function(err, rows) {
-    if(err) {
-      appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
-    }
-    else {
-      var lowest_price = rows[0].lowest_price;
-
     }
   });
 }
@@ -259,7 +265,9 @@ function sendEmail(flightData, subject_string) {
 
     transporter.sendMail(mailOptions, function(err, info){
   	    if(err){
-            appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
+          err.message = "transporter.sendMail";
+
+          appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
   	    }
         else {
           appendLogFile("Email Sent - " + subject_string + "\n\n");
@@ -273,47 +281,65 @@ function insertFlightData(flight_data) {
 
   var flight_id = null;
   var flight_exists = false;
+  var first_flight = true;
 
   waterfall([
     function(callback) {
-      var query = "SELECT * from flights where flight_key_long = " + connection.escape(flight_data[0].flight_key_long) + " and price = " + connection.escape(flight_data[0].price_pennies);
+      var query = "SELECT * FROM flights";
+      query += " WHERE from_iata = " +connection.escape(flight_info.departure);
+      query += " AND to_iata = " + connection.escape(flight_info.destination);
+      query += " AND departure_date = " + connection.escape(flight_data[0].legs[0].departure_time_formatted);
 
-      connection.query(query, function(error, rows) {
-        if(rows.length > 0) flight_exists = true;
-        callback(null);
+      connection.query(query, function(err, rows) {
+        if(err) {
+          err.message = "select * from flights where from_iata and to_iata and departure_date";
+
+          callback(err);
+        }
+        else if(rows.length > 0) {
+          first_flight = false;
+
+          callback(null);
+        }
+        else {
+          callback(null);
+        }
       });
     },
     function(callback) {
-      if(flight_exists === false) {
-        var query = "UPDATE flights SET current_low = " + connection.escape("N") + " where from_iata = " +connection.escape(flight_info.departure) + " and to_iata = " + connection.escape(flight_info.destination);
+      var query = "SELECT * FROM flights";
+      query += " WHERE flight_key_long = " + connection.escape(flight_data[0].flight_key_long);
+      query += " AND price = " + connection.escape(flight_data[0].price_pennies);
+
+      connection.query(query, function(err, rows) {
+        if(err) {
+          err.message = "select * from flights where flight_key_long and price";
+
+          callback(err);
+        }
+        else if(rows.length > 0){
+          flight_exists = true;
+
+          callback(null);
+        }
+        else {
+          callback(null);
+        }
+      });
+    },
+    function(callback) {
+      if(flight_exists === false && first_flight === false) {
+        var query = "UPDATE flights";
+        query += " SET current_low = " + connection.escape("N");
+        query += " WHERE from_iata = " +connection.escape(flight_info.departure);
+        query += " AND to_iata = " + connection.escape(flight_info.destination);
+        query += " AND departure_date = " + connetion.escape(flight_data[0].legs[0].departure_time_formatted);
 
         connection.query(query, function(err, rows) {
           if(err) {
-            callback(err);
-          }
-          else {
-            callback(null);
-          }
-        });
-      }
-    },
-    function(callback) {
-      if(flight_exists === false) {
-        var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration, departure_date, from_iata, to_iata, current_low, insert_date) VALUES (";
-        query += connection.escape(flight_data[0].flight_key)+",";
-        query += connection.escape(flight_data[0].flight_key_long)+",";
-        query += connection.escape(flight_data[0].price_pennies)+",";
-        query += connection.escape(flight_data[0].duration_seconds)+",";
-        query += connection.escape(flight_data[0].legs[0].departure_time_formatted)+",";
-        query += connection.escape(flight_info.departure)+",";
-        query += connection.escape(flight_info.destination)+",";
-        query += connection.escape("Y")+",";
-        query += connection.escape("NOW()");
-        query += ")";
+            err.message = "update flights set current_low = N where from_iata and to_iata and departure_date";
 
-        connection.query(query, function(error, rows) {
-          if(error) {
-            callback(error);
+            callback(err);
           }
           else {
             callback(null);
@@ -326,9 +352,40 @@ function insertFlightData(flight_data) {
     },
     function(callback) {
       if(flight_exists === false) {
-        connection.query("SELECT flight_id FROM flights ORDER BY flight_id DESC LIMIT 1", function(error, rows) {
-          if(error) {
-            callback(error);
+        var query = "INSERT INTO flights (flight_key, flight_key_long, price, duration, departure_date, from_iata, to_iata, current_low, hidden_city) VALUES (";
+        query += connection.escape(flight_data[0].flight_key)+",";
+        query += connection.escape(flight_data[0].flight_key_long)+",";
+        query += connection.escape(flight_data[0].price_pennies)+",";
+        query += connection.escape(flight_data[0].duration_seconds)+",";
+        query += connection.escape(flight_data[0].legs[0].departure_time_formatted)+",";
+        query += connection.escape(flight_info.departure)+",";
+        query += connection.escape(flight_info.destination)+",";
+        query += connection.escape("Y")+",";
+        query += flight_info.skip_hidden_city === true ? connection.escape("N") : connection.escape("Y");
+        query += ")";
+
+        connection.query(query, function(err, rows) {
+          if(err) {
+            err.message = "insert into flights";
+
+            callback(err);
+          }
+          else {
+            callback(null);
+          }
+        });
+      }
+      else {
+        callback(null);
+      }
+    },
+    function(callback) {
+      if(flight_exists === false) {
+        connection.query("SELECT flight_id FROM flights ORDER BY flight_id DESC LIMIT 1", function(err, rows) {
+          if(err) {
+            err.message = "select flight_id from flights order by flight_id desc limit 1";
+
+            callback(err);
           }
           else {
             flight_id = rows[0].flight_id;
@@ -398,6 +455,8 @@ function insertTripData(flight_id, flight_data, leg_number) {
 
   connection.query(query, function(err, rows) {
     if(err) {
+      err.message = "insert into trips";
+
       appendLogFile(JSON.stringify(err, undefined, 4) + "\n\n");
     }
     else {
@@ -548,7 +607,7 @@ function getFlightData(data, callback) {
 function appendLogFile(text) {
   var moment = require('moment-timezone');
   var datetime = moment().tz("America/Los_Angeles").format();
-  console.log(datetime);
+
   fs.appendFile(log, datetime + " " + text);
 }
 
