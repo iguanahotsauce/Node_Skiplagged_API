@@ -16,6 +16,8 @@ function Flight(data) {
   data.RETURN_DATE = data.RETURN_DATE || '';
   data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
   data.SAVE_TO_DATABASE = 'SAVE_TO_DATABASE' in data ? data.SAVE_TO_DATABASE : false;
+  data.FLIGHT_TIME = data.FLIGHT_TIME || 1;
+  data.BEFORE_OR_AFTER = data.BEFORE_OR_AFTER || null;
 
   var flightUrl = BASE_URL;
 
@@ -36,6 +38,8 @@ function Flight(data) {
   this.destination = flight_info.destination = data.TO;
   this.skip_hidden_city = flight_info.skip_hidden_city = data.SKIP_HIDDEN_CITY;
   this.departure_date = flight_info.departure_date = data.DEPART_DATE;
+  this.flight_time = flight_info.flight_time = data.FLIGHT_TIME;
+  this.before_or_after = flight_info.before_or_after = data.BEFORE_OR_AFTER;
 
   if(data.SAVE_TO_DATABASE === true) {
     data.MIN_PERCENT_CHANGE = data.MIN_PERCENT_CHANGE || 0;
@@ -533,6 +537,20 @@ function getFlightData(data, callback) {
 
   var flights = [];
 
+  var time_check = false;
+  var departure_date_time_preference = null;
+
+  if(flight_info.flight_time !== null && !isNaN(flight_info.flight_time) && flight_info.flight_time % 1 === 0) {
+    if(flight_info.before_or_after === 'BEFORE') {
+      time_check = 1;
+      departure_date_time_preference = moment(flight_info.departure_date + 'T' + flight_info.flight_time);
+    }
+    else if(flight_info.before_or_after == 'AFTER') {
+      time_check = 2;
+      departure_date_time_preference = moment(flight_info.departure_date + 'T' + flight_info.flight_time);
+    }
+  }
+
   return http.get({host: HOST, path: flightUrl}, function(response) {
     var body = '';
 
@@ -544,6 +562,7 @@ function getFlightData(data, callback) {
 
       for(var j=0; j<flight_data.depart.length; j++) {
         var is_hidden_city = false;
+        var incorrect_departure_time = false;
 
         var key = flight_data.depart[j][3];
 
@@ -560,21 +579,36 @@ function getFlightData(data, callback) {
         };
 
         for(var i=0; i<flight_data.flights[key][0].length; i++) {
-          if(i === (flight_data.flights[key][0].length - 1) && flight_data.flights[key][0][i][3] != destination && skip_hidden_city === true) {
+          var departure_zone = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('tz');
+          if(i === (flight_data.flights[key][0].length - 1) && flight_data.flights[key][0][(flight_data.flights[key][0].length) - 1][3] != destination && skip_hidden_city === true) {
             is_hidden_city = true;
             break;
           }
+          if(time_check !== false && i === 0) {
+            var departure_moment = moment.tz(flight_data.flights[key][0][i][2], departure_zone);
+            var flight_time_moment = moment.tz(flight_info.departure_date+'T'+flight_info.flight_time, departure_zone);
+            var difference = departure_moment.diff(flight_time_moment, 'minutes');
 
+            if(time_check === 1 && difference > 0) {
+              incorrect_departure_time = true;
+              break;
+            }
+            else if(time_check === 2 && difference < 0){
+              incorrect_departure_time = true;
+              break;
+            }
+          }
+
+          var arrival_zone = airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('tz');
           var duration_seconds = findTimestampDifference(flight_data.flights[key][0][i][2], flight_data.flights[key][0][i][4]);
           var duration_formatted = parseDurationInt(duration_seconds);
-
           var airline = flight_data.airlines[flight_data.flights[key][0][i][0].substring(0, 2)];
           var flight_number = flight_data.flights[key][0][i][0];
           var departing_from = airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('name') + ', ' + flight_data.flights[key][0][i][1] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][1]}).get('country');
           var arriving_at = airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('name') + ', ' + flight_data.flights[key][0][i][3] + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('city') + ', ' + airports.findWhere({iata: flight_data.flights[key][0][i][3]}).get('country');
-          var departure_time = moment(flight_data.flights[key][0][i][2]).format('dddd, MMMM Do YYYY, hh:mma');
+          var departure_time = moment.tz(flight_data.flights[key][0][i][2], departure_zone).format('dddd, MMMM Do YYYY, hh:mma');
           var departure_time_formatted = flight_data.flights[key][0][i][2];
-          var arrival_time = moment(flight_data.flights[key][0][i][4]).format('dddd, MMMM Do YYYY, hh:mma');
+          var arrival_time = moment.tz(flight_data.flights[key][0][i][4], arrival_zone).format('dddd, MMMM Do YYYY, hh:mma');
           var arrival_time_formatted = flight_data.flights[key][0][i][4];
           var current_leg = {airline: airline, flight_number: flight_number, duration: duration_formatted, duration_seconds: duration_seconds, departing_from: departing_from, departure_time: departure_time, departure_time_formatted: departure_time_formatted, arriving_at: arriving_at, arrival_time: arrival_time, arrival_time_formatted: arrival_time_formatted};
 
@@ -588,7 +622,7 @@ function getFlightData(data, callback) {
           current_flight.legs.push(current_leg);
         }
 
-        if(is_hidden_city === false) {
+        if(is_hidden_city === false && incorrect_departure_time === false) {
           flights.push(current_flight);
         }
 
