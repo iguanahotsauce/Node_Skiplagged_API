@@ -16,7 +16,7 @@ function Flight(data) {
   data.RETURN_DATE = data.RETURN_DATE || '';
   data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
   data.SAVE_TO_DATABASE = 'SAVE_TO_DATABASE' in data ? data.SAVE_TO_DATABASE : false;
-  data.FLIGHT_TIME = data.FLIGHT_TIME || 1;
+  data.FLIGHT_TIME = data.FLIGHT_TIME || null;
   data.BEFORE_OR_AFTER = data.BEFORE_OR_AFTER || null;
 
   var flightUrl = BASE_URL;
