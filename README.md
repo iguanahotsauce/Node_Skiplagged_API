@@ -51,10 +51,12 @@ Optional
 | Variable Name      | Datatype  | Default | Description
 |--------------------|---------- |---------|--------------------------------------------------------------------
 | SORT               | string    | 'cost'  | 'cost' Sorts by Cost Low to High<br>'duration' Sorts by Flight Duration Low to High<br>'path' Sorts by Number of Legs in Flight Low to High
-| RESULTS            | int       | 1       | 1 to Return First Result<br>0 to Return All Results
+| RESULTS            | integer   | 1       | 1 to Return First Result<br>0 to Return All Results
 | SKIP_HIDDEN_CITY   | boolean   | true    | Removes all Hidden City Flights From the Results
 | CONFIG             | object    | {}      | Object that stores data for mysql login and email login
 | MIN_PERCENT_CHANGE | float     | 0       | The percent change needed between the lowest flight price and the current flight price to send an email
+| FLIGHT_TIME        | integer   | 0       | The time you want to set for the departure time to be before or after<br>1 - 24 for the hour of the day
+| BEFORE_OR_AFTER    | string    | null    | 'BEFORE' to only find flights before the FLIGHT_TIME hour set<br>'AFTER' to only find flights after the FLIGHT_TIME hour set
 Config
 ======
 Example of the config.js file

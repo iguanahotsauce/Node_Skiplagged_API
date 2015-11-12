@@ -16,7 +16,7 @@ function Flight(data) {
   data.RETURN_DATE = data.RETURN_DATE || '';
   data.SKIP_HIDDEN_CITY = 'SKIP_HIDDEN_CITY' in data ? data.SKIP_HIDDEN_CITY : true;
   data.SAVE_TO_DATABASE = 'SAVE_TO_DATABASE' in data ? data.SAVE_TO_DATABASE : false;
-  data.FLIGHT_TIME = data.FLIGHT_TIME || null;
+  data.FLIGHT_TIME = data.FLIGHT_TIME || 0;
   data.BEFORE_OR_AFTER = data.BEFORE_OR_AFTER || null;
 
   var flightUrl = BASE_URL;
@@ -540,7 +540,7 @@ function getFlightData(data, callback) {
   var time_check = false;
   var departure_date_time_preference = null;
 
-  if(flight_info.flight_time !== null && !isNaN(flight_info.flight_time) && flight_info.flight_time % 1 === 0) {
+  if(flight_info.flight_time !== 0 && !isNaN(flight_info.flight_time) && flight_info.flight_time % 1 === 0 && flight_info.flight_time <= 24) {
     if(flight_info.before_or_after === 'BEFORE') {
       time_check = 1;
       departure_date_time_preference = moment(flight_info.departure_date + 'T' + flight_info.flight_time);
