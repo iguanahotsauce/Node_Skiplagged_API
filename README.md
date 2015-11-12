@@ -25,11 +25,14 @@ Table of Contents
    * [Least Layovers](#least-layovers)
      * [Example](#example-2)
      * [Response](#response-2)
-   * [Hidden City Flights](#hidden-city-flights)
+   * [Setting a Specific Departure Time](#setting-a-specific-departure-time)
      * [Example](#example-3)
      * [Response](#response-3)
-   * [Database Tracking of Flights](#database-tracking-of-flights)
+   * [Hidden City Flights](#hidden-city-flights)
      * [Example](#example-4)
+     * [Response](#response-4)
+   * [Database Tracking of Flights](#database-tracking-of-flights)
+     * [Example](#example-5)
  * [License](#license)
 
 Installation
@@ -305,6 +308,84 @@ CurrentFlight.getFlightData(function(error, body) {
             ],
             "flight_key": "e426142",
             "flight_key_long": "f88ef61cc3e0fd72879c3a4bbecca602791bf6d3b8f6a147c078f94e9e49f66c342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624e57ebe4f3af8eeda37c9a463907102d5d4b41411986645b404640faa406a1a612"
+        }
+    ]
+}
+```
+Setting a Specific Departure Time
+---------------------------------
+With the FLIGHT_TIME and BEFORE_OR_AFTER variables set you can search for flights that are before or after the FLIGHT_TIME hour that you set
+
+### Example
+```javascript
+var Flights = require('flights');
+
+var data = {
+  FROM: 'PDX',
+  TO: 'JFK',
+  DEPARTURE_DATE: '2016-06-01',
+  FLIGHT_TIME: 22,
+  BEFORE_OR_AFTER: 'AFTER'
+};
+
+var CurrentFlight = new Flights(data);
+
+CurrentFlight.getFlightData(function(error, body) {
+  body = JSON.stringify(body, undefined, 4);
+  console.log(body);
+});
+```
+### Response
+```json
+{
+    "flightData": [
+        {
+            "price": "$175.60",
+            "price_pennies": 17560,
+            "duration": "10 Hours 22 Minutes",
+            "duration_seconds": 37320,
+            "departure_time": "Wednesday, June 1st 2016, 10:59pm",
+            "arrival_time": "Thursday, June 2nd 2016, 12:21pm",
+            "legs": [
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL1067",
+                    "duration": "4 Hours 8 Minutes",
+                    "duration_seconds": 14880,
+                    "departing_from": "Portland Intl, PDX, Portland, United States",
+                    "departure_time": "Wednesday, June 1st 2016, 10:59pm",
+                    "departure_time_formatted": "2016-06-01T22:59:00-07:00",
+                    "arriving_at": "Detroit Metro Wayne Co, DTW, Detroit, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 06:07am",
+                    "arrival_time_formatted": "2016-06-02T06:07:00-04:00"
+                },
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL1218",
+                    "duration": "1 Hour 25 Minutes",
+                    "duration_seconds": 5100,
+                    "departing_from": "Detroit Metro Wayne Co, DTW, Detroit, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 07:33am",
+                    "departure_time_formatted": "2016-06-02T07:33:00-04:00",
+                    "arriving_at": "Ronald Reagan Washington Natl, DCA, Washington, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 08:58am",
+                    "arrival_time_formatted": "2016-06-02T08:58:00-04:00"
+                },
+                {
+                    "airline": "Delta Air Lines",
+                    "flight_number": "DL3901",
+                    "duration": "1 Hour 21 Minutes",
+                    "duration_seconds": 4860,
+                    "departing_from": "Ronald Reagan Washington Natl, DCA, Washington, United States",
+                    "departure_time": "Thursday, June 2nd 2016, 11:00am",
+                    "departure_time_formatted": "2016-06-02T11:00:00-04:00",
+                    "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
+                    "arrival_time": "Thursday, June 2nd 2016, 12:21pm",
+                    "arrival_time_formatted": "2016-06-02T12:21:00-04:00"
+                }
+            ],
+            "flight_key": "b38b98d",
+            "flight_key_long": "4d7ded7b19fd4946b25526c94ef76a367c64194c4c7a40962fe9c3c8929b8f0c342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624eb22eaa7994c1341c962d7016e47b88cda641311e446a3bd68e2714c1b1dbc2f6"
         }
     ]
 }
