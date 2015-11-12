@@ -164,7 +164,7 @@ CurrentFlight.getFlightData(function(error, body) {
             "price_pennies": 17560,
             "duration": "10 Hours 22 Minutes",
             "duration_seconds": 37320,
-            "departure_time": "Thursday, June 2nd 2016, 01:59am",
+            "departure_time": "Wednesday, June 1st 2016, 10:59pm",
             "arrival_time": "Thursday, June 2nd 2016, 12:21pm",
             "legs": [
                 {
@@ -173,7 +173,7 @@ CurrentFlight.getFlightData(function(error, body) {
                     "duration": "4 Hours 8 Minutes",
                     "duration_seconds": 14880,
                     "departing_from": "Portland Intl, PDX, Portland, United States",
-                    "departure_time": "Thursday, June 2nd 2016, 01:59am",
+                    "departure_time": "Wednesday, June 1st 2016, 10:59pm",
                     "departure_time_formatted": "2016-06-01T22:59:00-07:00",
                     "arriving_at": "Detroit Metro Wayne Co, DTW, Detroit, United States",
                     "arrival_time": "Thursday, June 2nd 2016, 06:07am",
@@ -205,7 +205,7 @@ CurrentFlight.getFlightData(function(error, body) {
                 }
             ],
             "flight_key": "b38b98d",
-            "flight_key_long": "4d7ded7b19fd4946b25526c94ef76a361e0e4fab833405e541499eaf68968ede342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624eb22eaa7994c1341c962d7016e47b88cda641311e446a3bd68e2714c1b1dbc2f6"
+            "flight_key_long": "4d7ded7b19fd4946b25526c94ef76a367c64194c4c7a40962fe9c3c8929b8f0c342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624eb22eaa7994c1341c962d7016e47b88cda641311e446a3bd68e2714c1b1dbc2f6"
         }
     ]
 }
@@ -232,14 +232,14 @@ CurrentFlight.getFlightData(function(error, body) {
 ```
 ### Response
 ```json
-{
+
     "flightData": [
         {
             "price": "$181.10",
             "price_pennies": 18110,
             "duration": "5 Hours 20 Minutes",
             "duration_seconds": 19200,
-            "departure_time": "Wednesday, June 1st 2016, 09:00am",
+            "departure_time": "Wednesday, June 1st 2016, 06:00am",
             "arrival_time": "",
             "legs": [
                 {
@@ -248,7 +248,7 @@ CurrentFlight.getFlightData(function(error, body) {
                     "duration": "5 Hours 20 Minutes",
                     "duration_seconds": 19200,
                     "departing_from": "Portland Intl, PDX, Portland, United States",
-                    "departure_time": "Wednesday, June 1st 2016, 09:00am",
+                    "departure_time": "Wednesday, June 1st 2016, 06:00am",
                     "departure_time_formatted": "2016-06-01T06:00:00-07:00",
                     "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
                     "arrival_time": "Wednesday, June 1st 2016, 02:20pm",
@@ -290,7 +290,7 @@ CurrentFlight.getFlightData(function(error, body) {
             "price_pennies": 18110,
             "duration": "5 Hours 20 Minutes",
             "duration_seconds": 19200,
-            "departure_time": "Wednesday, June 1st 2016, 09:00am",
+            "departure_time": "Wednesday, June 1st 2016, 06:00am",
             "arrival_time": "",
             "legs": [
                 {
@@ -299,7 +299,7 @@ CurrentFlight.getFlightData(function(error, body) {
                     "duration": "5 Hours 20 Minutes",
                     "duration_seconds": 19200,
                     "departing_from": "Portland Intl, PDX, Portland, United States",
-                    "departure_time": "Wednesday, June 1st 2016, 09:00am",
+                    "departure_time": "Wednesday, June 1st 2016, 06:00am",
                     "departure_time_formatted": "2016-06-01T06:00:00-07:00",
                     "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
                     "arrival_time": "Wednesday, June 1st 2016, 02:20pm",
@@ -307,7 +307,7 @@ CurrentFlight.getFlightData(function(error, body) {
                 }
             ],
             "flight_key": "e426142",
-            "flight_key_long": "f88ef61cc3e0fd72879c3a4bbecca602791bf6d3b8f6a147c078f94e9e49f66c342145e4ad81d47583adb167d7eb66df19710f4d97a7531a5e5e83cc60c8624e57ebe4f3af8eeda37c9a463907102d5d4b41411986645b404640faa406a1a612"
+            "flight_key_long": "230be59fb91c9257bc546e3d8ddc621ba49444ed90a0dbfaa0cbbe07ba4c28e418472b2910486da4ee5f0eae220994110f11e453b00b28473277d9171cd4fe2cbb38c34ba75f2305687e7231ac6c1712c5b022ed880f942320d3a3267d8d0ec3"
         }
     ]
 }
@@ -425,7 +425,7 @@ CurrentFlight.getFlightData(function(error, body) {
             "price_pennies": 11260,
             "duration": "5 Hours 13 Minutes",
             "duration_seconds": 18780,
-            "departure_time": "Thursday, June 2nd 2016, 12:55am",
+            "departure_time": "Wednesday, June 1st 2016, 09:55pm",
             "arrival_time": "Thursday, June 2nd 2016, 10:07am",
             "legs": [
                 {
@@ -434,7 +434,7 @@ CurrentFlight.getFlightData(function(error, body) {
                     "duration": "5 Hours 13 Minutes",
                     "duration_seconds": 18780,
                     "departing_from": "Portland Intl, PDX, Portland, United States",
-                    "departure_time": "Thursday, June 2nd 2016, 12:55am",
+                    "departure_time": "Wednesday, June 1st 2016, 09:55pm",
                     "departure_time_formatted": "2016-06-01T21:55:00-07:00",
                     "arriving_at": "John F Kennedy Intl, JFK, New York, United States",
                     "arrival_time": "Thursday, June 2nd 2016, 06:08am",
