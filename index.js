@@ -290,7 +290,7 @@ function insertFlightData(flight_data) {
       var query = "SELECT * FROM flights";
       query += " WHERE from_iata = " +connection.escape(flight_info.departure);
       query += " AND to_iata = " + connection.escape(flight_info.destination);
-      query += " AND departure_date = " + connection.escape(flight_data[0].legs[0].departure_time_formatted);
+      query += " AND date(departure_date) = " + connection.escape(flight_info.departure_date);
 
       connection.query(query, function(err, rows) {
         if(err) {
@@ -335,7 +335,7 @@ function insertFlightData(flight_data) {
         query += " SET current_low = " + connection.escape("N");
         query += " WHERE from_iata = " +connection.escape(flight_info.departure);
         query += " AND to_iata = " + connection.escape(flight_info.destination);
-        query += " AND departure_date = " + connetion.escape(flight_data[0].legs[0].departure_time_formatted);
+        query += " AND date(departure_date) = " + connection.escape(flight_info.departure_date);
 
         connection.query(query, function(err, rows) {
           if(err) {
