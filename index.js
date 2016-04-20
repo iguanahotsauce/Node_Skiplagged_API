@@ -525,7 +525,6 @@ function findTimestampDifference(start_timestamp, end_timestamp) {
 }
 
 function getFlightData(data, callback) {
-  var request = require('request');
   var airports = require('airport-codes');
   var http = require('http');
   var moment = require('moment-timezone');
