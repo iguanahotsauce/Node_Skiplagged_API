@@ -48,7 +48,7 @@ Required
 |----------------|----------|-----------------------------------------------------------------------------
 | FROM           | string   | Departure Airport IATA Code
 | TO             | string   | Arrival Airport IATA Code
-| DEPARTURE_DATE | string   | Departure Date in YYYY-MM-DD format
+| DEPART_DATE    | string   | Departure Date in YYYY-MM-DD format
 Optional
 --------
 | Variable Name      | Datatype  | Default | Description
@@ -145,7 +145,7 @@ var Flights = require('flights');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPARTURE_DATE: '2016-06-01'
+  DEPART_DATE: '2016-06-01'
 };
 
 var CurrentFlight = new Flights(data);
@@ -219,7 +219,7 @@ var Flights = require('flights');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPARTURE_DATE: '2016-06-01',
+  DEPART_DATE: '2016-06-01',
   SORT: 'duration'
 };
 
@@ -270,7 +270,7 @@ var Flights = require('flights');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPARTURE_DATE: '2016-06-01',
+  DEPART_DATE: '2016-06-01',
   SORT: 'path'
 };
 
@@ -323,7 +323,7 @@ var Flights = require('flights');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPARTURE_DATE: '2016-06-01',
+  DEPART_DATE: '2016-06-01',
   FLIGHT_TIME: 22,
   BEFORE_OR_AFTER: 'AFTER'
 };
@@ -405,7 +405,7 @@ var Flights = require('flights');
 var data = {
   FROM: 'PDX',
   TO: 'JFK',
-  DEPARTURE_DATE: '2016-06-01',
+  DEPART_DATE: '2016-06-01',
   SKIP_HIDDEN_CITY: false
 };
 
