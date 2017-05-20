@@ -26,7 +26,7 @@ function Flight(data) {
                 '&to='           +
                 data.TO          +
                 '&depart='       +
-                data.DEPART_DATE +
+                data.DEPARTURE_DATE +
                 '&return'        +
                 data.RETURN_DATE +
                 '&sort='         +
@@ -37,7 +37,7 @@ function Flight(data) {
   this.departure = flight_info.departure = data.FROM;
   this.destination = flight_info.destination = data.TO;
   this.skip_hidden_city = flight_info.skip_hidden_city = data.SKIP_HIDDEN_CITY;
-  this.departure_date = flight_info.departure_date = data.DEPART_DATE;
+  this.departure_date = flight_info.departure_date = data.DEPARTURE_DATE;
   this.flight_time = flight_info.flight_time = data.FLIGHT_TIME;
   this.before_or_after = flight_info.before_or_after = data.BEFORE_OR_AFTER;
 
