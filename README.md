@@ -4,6 +4,8 @@ Node_Skiplagged_API
 ===================
 A node.js wrapper for the [Skiplagged](http://skiplagged.com) API
 
+Update coming soon
+
 Table of Contents
 =================
  * [Installation](#installation)
